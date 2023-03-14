@@ -7,7 +7,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Flask Auth Example</title>
+    <title>Recommenda - Conheça os seus clientes</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" />
 </head>
 
@@ -21,24 +21,24 @@
                     <div id="navbarMenuHeroA" class="navbar-menu">
                         <div class="navbar-end">
                             <a href="{{ url_for('main.index') }}" class="navbar-item">
-                                Home
+                                Início
                             </a>
                             {% if current_user.is_authenticated %}
                             <a href="{{ url_for('main.profile') }}" class="navbar-item">
-                                Profile
+                                Perfil
                             </a>
                             {% endif %}
                             {% if not current_user.is_authenticated %}
                             <a href="{{ url_for('auth.login') }}" class="navbar-item">
-                                Login
+                                Entrar
                             </a>
                             <a href="{{ url_for('auth.signup') }}" class="navbar-item">
-                                Sign Up
+                                Cadastrar
                             </a>
                             {% endif %}
                             {% if current_user.is_authenticated %}
                             <a href="{{ url_for('auth.logout') }}" class="navbar-item">
-                                Logout
+                                Sair
                             </a>
                             {% endif %}
                         </div>
@@ -49,8 +49,8 @@
 
         <div class="hero-body">
             <div class="container has-text-centered">
-               {% block content %}
-               {% endblock %}
+                {% block content %}
+                {% endblock %}
             </div>
         </div>
     </section>
