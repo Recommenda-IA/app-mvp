@@ -2,3 +2,4 @@ env-recommenda-mvp
 project/__pycache__
 migrations
 .env
+comandos.txt
