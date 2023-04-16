@@ -3,7 +3,6 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 import os
-from dotenv import load_dotenv
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
