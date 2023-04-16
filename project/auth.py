@@ -36,7 +36,7 @@ def login_post():
 
 @auth.route('/signup')
 def signup():
-    return render_template('login.html')
+    return render_template('signup.html')
 
 
 @auth.route('/signup', methods=['POST'])
@@ -45,6 +45,10 @@ def signup_post():
     email = request.form.get('email')
     name = request.form.get('name')
     password = request.form.get('password')
+
+    # Cadastros desabilitados.
+    flash('Cadastros desabilitados')
+    return redirect(url_for('auth.signup'))
 
     # if this returns a user, then the email already exists in database
     user = User.query.filter_by(email=email).first()
