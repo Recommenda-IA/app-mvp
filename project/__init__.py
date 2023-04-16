@@ -3,6 +3,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 import os
+from dotenv import load_dotenv
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -14,10 +15,14 @@ from flask.logging import default_handler
 db = SQLAlchemy()
 migrate = Migrate()
 
+
 def create_app():
     app = Flask(__name__)
 
+    load_dotenv('/home/carlos/Documentos/RECOMMENDA/mvp/app-mvp/.env')
+
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
+    app.config['SECRET_KEY'] = '12345'
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -43,6 +48,7 @@ def create_app():
 
     return app
 
+
 def configure_logging(app):
     # Logging Configuration
     if app.config['LOG_WITH_GUNICORN']:
@@ -53,7 +59,8 @@ def configure_logging(app):
         file_handler = RotatingFileHandler('instance/flask-user-management.log',
                                            maxBytes=16384,
                                            backupCount=20)
-        file_formatter = logging.Formatter('%(asctime)s %(levelname)s %(threadName)s-%(thread)d: %(message)s [in %(filename)s:%(lineno)d]')
+        file_formatter = logging.Formatter(
+            '%(asctime)s %(levelname)s %(threadName)s-%(thread)d: %(message)s [in %(filename)s:%(lineno)d]')
         file_handler.setFormatter(file_formatter)
         file_handler.setLevel(logging.INFO)
         app.logger.addHandler(file_handler)
