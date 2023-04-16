@@ -19,8 +19,6 @@ migrate = Migrate()
 def create_app():
     app = Flask(__name__)
 
-    load_dotenv('/home/carlos/Documentos/RECOMMENDA/mvp/app-mvp/.env')
-
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
     app.config['SECRET_KEY'] = '12345'
 
