@@ -53,44 +53,16 @@
                 </div>
 
                 <div id="navbarExampleTransparentExample" class="navbar-menu">
-                    <div class="navbar-start">
-                        {% if not current_user.is_authenticated %}
-                        <a href="{{ url_for('main.index') }}" class="navbar-item">
-                            Início
-                        </a>
-                        <a href="{{ url_for('main.price') }}" class="navbar-item">
-                            Preços
-                        </a>
-                        <a href="{{ url_for('main.products') }}" class="navbar-item">
-                            Produtos
-                        </a>
-                        {% endif %}
-                    </div>
                     <div class="navbar-end">
-                        {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('main.dashboard') }}" class="navbar-item">
+                            Dashboard
+                        </a>
                         <a href="{{ url_for('main.profile') }}" class="navbar-item">
                             Perfil
                         </a>
-                        {% endif %}
-                        {% if not current_user.is_authenticated %}
-                        <div class="field is-grouped navbar-item">
-                            <p class="control">
-                                <a class="button is-info is-outlined" href="{{ url_for('auth.login') }}">
-                                    Entrar
-                                </a>
-                            </p>
-                            <p class="control">
-                                <a class="button is-info is-outlined" href="{{ url_for('auth.signup') }}">
-                                    Cadastrar
-                                </a>
-                            </p>
-                        </div>
-                        {% endif %}
-                        {% if current_user.is_authenticated %}
                         <a href="{{ url_for('auth.logout') }}" class="navbar-item">
                             Sair
                         </a>
-                        {% endif %}
                     </div>
                 </div>
             </nav>
