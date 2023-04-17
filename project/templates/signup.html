@@ -3,47 +3,50 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="column is-4 is-offset-4">
-    <h3 class="title">Cadastrar</h3>
-    <div class="box">
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <div class="notification is-danger">
-            {{ messages[0] }}. Ir para a <a href="{{ url_for('auth.login') }}">página de login</a>.
+
+<div class="container has-text-centered">
+    <div class="column is-4 is-offset-4">
+        <h3 class="title">Cadastrar</h3>
+        <div class="box">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="notification is-danger">
+                {{ messages[0] }}. Ir para a <a href="{{ url_for('auth.login') }}">página de login</a>.
+            </div>
+            {% endif %}
+            {% endwith %}
+            <form method="POST" action="/signup">
+                <div class="field">
+                    <div class="control has-icons-left">
+                        <input class="input" type="email" name="email" placeholder="E-mail" autofocus="">
+                        <span class="icon is-small is-left">
+                            <ion-icon name="mail-outline"></ion-icon>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control has-icons-left">
+                        <input class="input" type="text" name="name" placeholder="Nome" autofocus="">
+                        <span class="icon is-small is-left">
+                            <ion-icon name="person-outline"></ion-icon>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control has-icons-left">
+                        <input class="input" type="password" name="password" placeholder="Senha">
+                        <span class="icon is-small is-left">
+                            <ion-icon name="lock-closed-outline"></ion-icon>
+                        </span>
+                    </div>
+                </div>
+
+                <button class="button is-block is-info is-fullwidth">Cadastrar</button>
+            </form>
         </div>
-        {% endif %}
-        {% endwith %}
-        <form method="POST" action="/signup">
-            <div class="field">
-                <div class="control has-icons-left">
-                    <input class="input" type="email" name="email" placeholder="E-mail" autofocus="">
-                    <span class="icon is-small is-left">
-                        <ion-icon name="mail-outline"></ion-icon>
-                    </span>
-                </div>
-            </div>
-
-            <div class="field">
-                <div class="control has-icons-left">
-                    <input class="input" type="text" name="name" placeholder="Nome" autofocus="">
-                    <span class="icon is-small is-left">
-                        <ion-icon name="person-outline"></ion-icon>
-                    </span>
-                </div>
-            </div>
-
-            <div class="field">
-                <div class="control has-icons-left">
-                    <input class="input" type="password" name="password" placeholder="Senha">
-                    <span class="icon is-small is-left">
-                        <ion-icon name="lock-closed-outline"></ion-icon>
-                    </span>
-                </div>
-            </div>
-
-            <button class="button is-block is-info is-fullwidth">Cadastrar</button>
-        </form>
     </div>
+    <p>&copy; 2023 Saturn Software ME</p>
 </div>
-<p>&copy; 2023 Saturn Software ME</p>
 {% endblock %}

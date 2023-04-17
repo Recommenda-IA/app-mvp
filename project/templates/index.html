@@ -3,11 +3,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 class="title">
-  <img src="{{ url_for('static', filename='img/logo.png') }}" width="350">
-</h1>
-<h2 class="subtitle">
-  Sistemas de Recomendação Personalizados
-</h2>
-<p>&copy; 2023 Saturn Software ME</p>
+
+<div class="container has-text-centered">
+  <h1 class="title">
+    <img src="{{ url_for('static', filename='img/logo.png') }}" width="350">
+  </h1>
+  <h2 class="subtitle">
+    Sistemas de Recomendação Personalizados
+  </h2>
+  <p>&copy; 2023 Saturn Software ME</p>
+</div>
 {% endblock %}
