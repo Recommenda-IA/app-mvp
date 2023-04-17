@@ -1,3 +1,7 @@
+.title {
+  font-size: 1.25em !important;
+}
+
 .navbar-item img {
   max-height: 100% !important;
 }
