@@ -3,3 +3,4 @@ project/__pycache__
 migrations
 .env
 comandos.txt
+project/models/__pycache__/
