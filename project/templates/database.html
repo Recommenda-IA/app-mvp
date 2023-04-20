@@ -6,69 +6,80 @@
 
 <div class="columns is-full">
   <div class="column">
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="notification is-success">
+      {{ messages[0] }}
+    </div>
+    {% endif %}
+    {% endwith %}
+
     <div class="box">
 
       <div class="field">
         <h2 class="subtitle">Informações de banco de dados</h2>
       </div>
 
-      <div class="field is-horizontal">
-        <div class="field-body">
-          <div class="field">
-            <p class="control is-expanded has-icons-left">
-              <input class="input" type="text" name="db_user" placeholder="Usuário do banco de dados">
-              <span class="icon is-small is-left">
-                <ion-icon name="person-outline"></ion-icon>
-              </span>
-            </p>
-          </div>
-          <div class="field">
-            <p class="control is-expanded has-icons-left">
-              <input class="input" type="db_password" placeholder="Senha do banco de dados" value="">
-              <span class="icon is-small is-left">
-                <ion-icon name="lock-closed-outline"></ion-icon>
-              </span>
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="field is-horizontal">
-        <div class="field-body">
-          <div class="field">
-            <p class="control is-expanded has-icons-left">
-              <input class="input" type="text" name="db_host" placeholder="Servidor do banco de dados">
-              <span class="icon is-small is-left">
-                <ion-icon name="globe-outline"></ion-icon>
-              </span>
-            </p>
-          </div>
-          <div class="field">
-            <p class="control is-expanded has-icons-left">
-              <input class="input" type="text" name="db_name" placeholder="Nome do banco de dados" value="">
-              <span class="icon is-small is-left">
-                <ion-icon name="server-outline"></ion-icon>
-              </span>
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="field mb-6">
-        <small><ion-icon name="information-circle-outline"></ion-icon> Recomendável cadastrar um usuário com
-          permissão de somente leitura.</small>
-      </div>
-
-      <div class="field is-horizontal">
-        <div class="field-body">
-          <div class="field">
-            <div class="control">
-              <button class="button is-info">
-                Salvar
-              </button>
+      <form method="POST" action="/database/save-database">
+        <div class="field is-horizontal">
+          <div class="field-body">
+            <div class="field">
+              <p class="control is-expanded has-icons-left">
+                <input class="input" type="text" name="db_user" placeholder="Usuário do banco de dados">
+                <span class="icon is-small is-left">
+                  <ion-icon name="person-outline"></ion-icon>
+                </span>
+              </p>
+            </div>
+            <div class="field">
+              <p class="control is-expanded has-icons-left">
+                <input class="input" type="text" name="db_password" placeholder="Senha do banco de dados" value="">
+                <span class="icon is-small is-left">
+                  <ion-icon name="lock-closed-outline"></ion-icon>
+                </span>
+              </p>
             </div>
           </div>
         </div>
-      </div>
+        <div class="field is-horizontal">
+          <div class="field-body">
+            <div class="field">
+              <p class="control is-expanded has-icons-left">
+                <input class="input" type="text" name="db_host" placeholder="Servidor do banco de dados">
+                <span class="icon is-small is-left">
+                  <ion-icon name="globe-outline"></ion-icon>
+                </span>
+              </p>
+            </div>
+            <div class="field">
+              <p class="control is-expanded has-icons-left">
+                <input class="input" type="text" name="db_name" placeholder="Nome do banco de dados" value="">
+                <span class="icon is-small is-left">
+                  <ion-icon name="server-outline"></ion-icon>
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="field mb-6">
+          <small><ion-icon name="information-circle-outline"></ion-icon> Recomendável cadastrar um usuário com
+            permissão de somente leitura.</small>
+        </div>
+
+        <div class="field is-horizontal">
+          <div class="field-body">
+            <div class="field">
+              <div class="control">
+                <button class="button is-info" type="submit">
+                  Salvar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
 
 
     </div>
