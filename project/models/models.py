@@ -16,10 +16,14 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
     name = db.Column(db.String(1000), nullable=False)
+    database_accesses = db.relationship(
+        'Database_access', backref='user', lazy=True)
 
 
 class Database_access(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'),
+                        nullable=False)
     db_user = db.Column(db.String(100), nullable=False)
     db_password = db.Column(db.String(100), nullable=False)
     db_name = db.Column(db.String(1000), nullable=False)

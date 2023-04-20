@@ -5,6 +5,7 @@ from flask_login import login_required, current_user
 from .models.models import Database_access
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import exc
 
 main = Blueprint('main', __name__)
 
@@ -39,22 +40,52 @@ def profile():
 @main.route('/database')
 @login_required
 def database():
-    return render_template('database.html', name=current_user.name)
+    data_database = Database_access.query.filter_by(
+        user_id=current_user.id).first()
+    return render_template('database.html', name=current_user.name, data_database=data_database)
 
 
-@main.route('/database/save-database', methods=['POST'])
+@main.route('/database/action/<action>', methods=['POST'])
 @login_required
-def database_save():
-    db_user = request.form.get('db_user')
-    db_password = request.form.get('db_password')
-    db_host = request.form.get('db_host')
-    db_name = request.form.get('db_name')
+def database_action(action):
 
-    new_database = Database_access(db_user=db_user, db_host=db_host,
-                                   db_password=generate_password_hash(db_password, method='sha256'), db_name=db_name)
-    db.session.add(new_database)
-    db.session.commit()
+    error = ''
+    data_database = Database_access.query.filter_by(
+        user_id=current_user.id).first()
 
-    flash('Banco de dados cadastrado')
+    if action == 'create':
+        try:
+            db_user = request.form.get('db_user')
+            db_password = request.form.get('db_password')
+            db_host = request.form.get('db_host')
+            db_name = request.form.get('db_name')
 
-    return render_template('database.html', name=current_user.name)
+            new_database = Database_access(db_user=db_user, user_id=current_user.id, db_host=db_host,
+                                           db_password=db_password, db_name=db_name)
+            db.session.add(new_database)
+            db.session.commit()
+
+            flash('Banco de dados cadastrado')
+
+        except exc.SQLAlchemyError as error:
+            error = str(error.orig) + " for parameters " + \
+                str(error.params), 'error'
+
+    if action == 'delete':
+        try:
+            db_delete = request.form.get('db_delete')
+            if db_delete == 'deletar':
+                database_access = Database_access.query.filter_by(
+                    user_id=current_user.id)
+                db.session.delete(database_access)
+                db.session.commit()
+
+                flash('Informações de banco de dados excluídas com sucesso!')
+            else:
+                error = 'Por favor, digite deletar para confirmar a exclusão de informações.'
+
+        except exc.SQLAlchemyError as error:
+            error = str(error.orig) + " for parameters " + \
+                str(error.params), 'error'
+
+    return render_template('database.html', name=current_user.name, error=error, data_database=data_database)

@@ -5,6 +5,9 @@
 {% block content %}
 
 <div class="columns is-full">
+  <div class="column is-one-quarter">
+    {% include 'navigations/basket_analysis.html' %}
+  </div>
   <div class="column">
 
     {% with messages = get_flashed_messages() %}
@@ -15,71 +18,92 @@
     {% endif %}
     {% endwith %}
 
+    {% if error %}
+    <div class="notification is-danger">
+      Erro: {{ error }}
+    </div>
+    {% endif %}
+
     <div class="box">
 
       <div class="field">
         <h2 class="subtitle">Informações de banco de dados</h2>
       </div>
 
-      <form method="POST" action="/database/save-database">
-        <div class="field is-horizontal">
-          <div class="field-body">
-            <div class="field">
-              <p class="control is-expanded has-icons-left">
-                <input class="input" type="text" name="db_user" placeholder="Usuário do banco de dados">
-                <span class="icon is-small is-left">
-                  <ion-icon name="person-outline"></ion-icon>
-                </span>
-              </p>
-            </div>
-            <div class="field">
-              <p class="control is-expanded has-icons-left">
-                <input class="input" type="text" name="db_password" placeholder="Senha do banco de dados" value="">
-                <span class="icon is-small is-left">
-                  <ion-icon name="lock-closed-outline"></ion-icon>
-                </span>
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="field is-horizontal">
-          <div class="field-body">
-            <div class="field">
-              <p class="control is-expanded has-icons-left">
-                <input class="input" type="text" name="db_host" placeholder="Servidor do banco de dados">
-                <span class="icon is-small is-left">
-                  <ion-icon name="globe-outline"></ion-icon>
-                </span>
-              </p>
-            </div>
-            <div class="field">
-              <p class="control is-expanded has-icons-left">
-                <input class="input" type="text" name="db_name" placeholder="Nome do banco de dados" value="">
-                <span class="icon is-small is-left">
-                  <ion-icon name="server-outline"></ion-icon>
-                </span>
-              </p>
-            </div>
-          </div>
-        </div>
+      {% if data_database.db_user %}
+      <form method="POST" action="/database/action/delete">
+        {% else %}
+        <form method="POST" action="/database/action/create">
+          {% endif %}
 
-        <div class="field mb-6">
-          <small><ion-icon name="information-circle-outline"></ion-icon> Recomendável cadastrar um usuário com
-            permissão de somente leitura.</small>
-        </div>
-
-        <div class="field is-horizontal">
-          <div class="field-body">
-            <div class="field">
-              <div class="control">
-                <button class="button is-info" type="submit">
-                  Salvar
-                </button>
+          <div class="field is-horizontal">
+            <div class="field-body">
+              <div class="field">
+                <p class="control is-expanded has-icons-left">
+                  <input class="input" type="text" name="db_user" placeholder="Usuário do banco de dados"
+                    value="{{ data_database.db_user }}">
+                  <span class="icon is-small is-left">
+                    <ion-icon name="person-outline"></ion-icon>
+                  </span>
+                </p>
+              </div>
+              <div class="field">
+                <p class="control is-expanded has-icons-left">
+                  <input class="input" type="text" name="db_password" placeholder="Senha do banco de dados"
+                    value="{{ data_database.db_password }}">
+                  <span class="icon is-small is-left">
+                    <ion-icon name="lock-closed-outline"></ion-icon>
+                  </span>
+                </p>
               </div>
             </div>
           </div>
-        </div>
-      </form>
+          <div class="field is-horizontal">
+            <div class="field-body">
+              <div class="field">
+                <p class="control is-expanded has-icons-left">
+                  <input class="input" type="text" name="db_host" placeholder="Servidor do banco de dados"
+                    value="{{ data_database.db_host }}">
+                  <span class="icon is-small is-left">
+                    <ion-icon name="globe-outline"></ion-icon>
+                  </span>
+                </p>
+              </div>
+              <div class="field">
+                <p class="control is-expanded has-icons-left">
+                  <input class="input" type="text" name="db_name" placeholder="Nome do banco de dados"
+                    value="{{ data_database.db_name }}">
+                  <span class="icon is-small is-left">
+                    <ion-icon name="server-outline"></ion-icon>
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="field mb-2">
+            <small><ion-icon name="information-circle-outline"></ion-icon> Recomendável cadastrar um usuário com
+              permissão de somente leitura.</small>
+          </div>
+
+          <div class="field">
+            <div class="field-body">
+              {% if data_database.db_user %}
+              <div class="notification p-2 is-danger is-light">
+                <p class="mb-2"><small>Para deletar as informações, digite <i>deletar</i></small></p>
+                <input class="input is-small is-2 mb-2" type="text" maxlength="10" name="db_delete">
+                <button class="button is-danger" type="submit">
+                  Excluir
+                </button>
+              </div>
+              {% else %}
+              <button class="button is-info" type="submit">
+                Salvar
+              </button>
+              {% endif %}
+            </div>
+          </div>
+        </form>
 
 
     </div>
