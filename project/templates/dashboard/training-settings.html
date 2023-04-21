@@ -1,0 +1,89 @@
+<!-- templates/profile.html -->
+
+{% extends "parts/base-intern.html" %}
+
+{% block content %}
+
+<div class="columns is-full">
+  <div class="column is-one-quarter">
+    {% include 'navigations/basket_analysis.html' %}
+  </div>
+  <div class="column">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="notification is-success">
+      <button class="delete"></button>
+      {{ messages[0] }}
+    </div>
+    {% endif %}
+    {% endwith %}
+    {% if error %}
+    <div class="notification is-danger">
+      <button class="delete"></button>
+      Erro: {{ error }}
+    </div>
+    {% endif %}
+    <div class="box">
+      <div class="field">
+        <h2 class="subtitle">Configurações de treinamento</h2>
+      </div>
+      {% if data_training.tr_frequency %}
+      <form method="POST" action="/training-settings/update">
+        {% else %}
+        <form method="POST" action="/training-settings/create">
+          {% endif %}
+          <div class="field is-horizontal">
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <label class="radio">
+                    <input type="radio" name="tr_activated" value="1" {% if data_training.tr_activated==1 :
+                      %}checked="checked" {% endif %}>
+                    Ativado
+                  </label>
+                  <label class="radio">
+                    <input type="radio" name="tr_activated" value="0" {% if data_training.tr_activated==0 :
+                      %}checked="checked" {% endif %}>
+                    Desativado
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <h2 class="subtitle">Frequência de atualização das regras</h2>
+          </div>
+          <div class="field is-horizontal">
+            <div class="field-body">
+              <div class="field">
+                <p class="control is-expanded has-icons-left">
+                <div class="select">
+                  <select name="tr_frequency">
+                    <option value="daily" {% if data_training.tr_frequency=="daily" : %}selected{% endif %}>
+                      Diariamente</option>
+                    <option value="weekly" {% if data_training.tr_frequency=="weekly" : %}selected{% endif %}>
+                      Semanal</option>
+                    <option value="fortnightly" {% if data_training.tr_frequency=="fortnightly" : %}selected{% endif %}>
+                      Quinzenal</option>
+                    <option value="monthly" {% if data_training.tr_frequency=="monthly" : %}selected{% endif %}>
+                      Mensal</option>
+                  </select>
+                </div>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-body">
+              <button class="button is-info" type="submit">
+                Salvar
+              </button>
+            </div>
+          </div>
+        </form>
+    </div>
+  </div>
+</div>
+</div>
+
+{% endblock %}
