@@ -5,3 +5,8 @@
 .navbar-item img {
   max-height: 100% !important;
 }
+
+.box {
+  box-shadow: none !important;
+  border: 1px solid #dbdbdb !important;
+}

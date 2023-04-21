@@ -32,6 +32,16 @@
             });
 
         });
+
+        document.addEventListener('DOMContentLoaded',() => {
+            (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
+                const $notification = $delete.parentNode;
+
+                $delete.addEventListener('click',() => {
+                    $notification.parentNode.removeChild($notification);
+                });
+            });
+        });
     </script>
 </head>
 
@@ -105,7 +115,7 @@
         </div>
 
         <div class="container has-text-centered">
-            <p>&copy; 2023 Saturn Software ME - v 0.0.4 - Todos os direiros reservados</p>
+            <p>&copy; 2023 Saturn Software ME - v 0.0.5 - Todos os direiros reservados</p>
             <br>
         </div>
     </section>

@@ -9,33 +9,52 @@
     {% include 'navigations/basket_analysis.html' %}
   </div>
   <div class="column">
-
     {% with messages = get_flashed_messages() %}
     {% if messages %}
     <div class="notification is-success">
+      <button class="delete"></button>
       {{ messages[0] }}
     </div>
     {% endif %}
     {% endwith %}
-
     {% if error %}
     <div class="notification is-danger">
+      <button class="delete"></button>
       Erro: {{ error }}
     </div>
     {% endif %}
-
+    {% if data_database.db_user %}
     <div class="box">
-
+      <h2 class="subtitle">Status do banco de dados</h2>
+      <br>
+      {% if database_user_conected %}
+      <div class="tags has-addons">
+        <span class="tag">{{ data_database.db_name }}</span>
+        <span class="tag is-success">Conectado</span>
+      </div>
+      {% else %}
+      <div class="tags has-addons">
+        <span class="tag">{{ data_database.db_name }}</span>
+        <span class="tag is-danger">Desconectado</span>
+      </div>
+      {% if error_db_user %}
+      <div class="notification is-danger is-light">
+        Erro de conexão: {{ error_db_user }}
+      </div>
+      {% endif %}
+      {% endif %}
+    </div>
+    {% endif %}
+    <div class="box">
       <div class="field">
         <h2 class="subtitle">Informações de banco de dados</h2>
+        <p>Recomendável cadastrar um usuário com permissão de somente leitura.</p>
       </div>
-
       {% if data_database.db_user %}
-      <form method="POST" action="/database/action/delete">
+      <form method="POST" action="/database/delete">
         {% else %}
-        <form method="POST" action="/database/action/create">
+        <form method="POST" action="/database/create">
           {% endif %}
-
           <div class="field is-horizontal">
             <div class="field-body">
               <div class="field">
@@ -80,12 +99,24 @@
               </div>
             </div>
           </div>
-
-          <div class="field mb-2">
-            <small><ion-icon name="information-circle-outline"></ion-icon> Recomendável cadastrar um usuário com
-              permissão de somente leitura.</small>
+          <div class="field">
+            <h2 class="subtitle">View para a consulta de itens e transações</h2>
+            <a class="js-modal-trigger" data-target="view-example-modal">Clique aqui</a> para ver um exemplo de View e
+            como deve ser o formato do retorno da consulta.
           </div>
-
+          <div class="field is-horizontal">
+            <div class="field-body">
+              <div class="field">
+                <p class="control is-expanded has-icons-left">
+                  <input class="input" type="text" name="db_view" placeholder="Nome da view de consulta"
+                    value="{{ data_database.db_view }}">
+                  <span class="icon is-small is-left">
+                    <ion-icon name="eye-outline"></ion-icon>
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
           <div class="field">
             <div class="field-body">
               {% if data_database.db_user %}
@@ -104,82 +135,63 @@
             </div>
           </div>
         </form>
-
-
     </div>
+  </div>
+</div>
+</div>
 
-    <div class="box">
-
-      <div class="field mb-6">
-        <h2 class="subtitle">Informações da tabela de pedidos</h2>
+<div class="modal" id="view-example-modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">View para a consulta de itens e transações</p>
+      <button class="delete" aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+      <p class="mb-1">Exemplo de view criada para obter os dados necessários para a análise:</p>
+      <div class="mb-3">
+        <code>CREATE VIEW Transacoes AS SELECT b.SalesOrderID as <b>id_transacao</b>, b.ProductID as <b>id_item</b>, a.OrderDate as <b>data_transacao</b> FROM adventureworks.salesorderheader as a INNER JOIN adventureworks.salesorderdetail as b ON b.SalesOrderID = a.SalesOrderID;</code>
       </div>
-
-      <div class="field is-horizontal">
-        <div class="field-body">
-          <div class="field">
-            <p class="control is-expanded has-icons-left">
-              <input class="input" type="text" name="tabela_pedidos" placeholder="Nome da tabela de pedidos">
-              <span class="icon is-small is-left">
-                <ion-icon name="information-outline"></ion-icon>
-              </span>
-            </p>
-          </div>
-          <div class="field">
-            <p class="control is-expanded has-icons-left">
-              <input class="input" type="tabela_info_pedidos" placeholder="Nome da tabela de informações de pedidos"
-                value="">
-              <span class="icon is-small is-left">
-                <ion-icon name="information-outline"></ion-icon>
-              </span>
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="field is-horizontal">
-        <div class="field-body">
-          <div class="field">
-            <p class="control is-expanded has-icons-left">
-              <input class="input" type="text" name="coluna_id_pedido" placeholder="Nome da coluna do id do pedido">
-              <span class="icon is-small is-left">
-                <ion-icon name="information-outline"></ion-icon>
-              </span>
-            </p>
-          </div>
-          <div class="field">
-            <p class="control is-expanded has-icons-left">
-              <input class="input" type="text" name="coluna_id_produto" placeholder="Nome da coluna do id do produto"
-                value="">
-              <span class="icon is-small is-left">
-                <ion-icon name="information-outline"></ion-icon>
-              </span>
-            </p>
-          </div>
-          <div class="field">
-            <p class="control is-expanded has-icons-left">
-              <input class="input" type="text" name="coluna_data_pedido" placeholder="Nome da coluna de data do pedido"
-                value="">
-              <span class="icon is-small is-left">
-                <ion-icon name="information-outline"></ion-icon>
-              </span>
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="field is-horizontal">
-        <div class="field-body">
-          <div class="field">
-            <div class="control">
-              <button class="button is-info">
-                Salvar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-    </div>
+      <p class="mb-3">É obrigatório conter as colunas de identificadores de transacões, identificadores de itens das
+        transacões e data das transacões
+        nomeadas como <b>id_transacao</b>, <b>id_item</b> e <b>data_transacao</b>, respectivamente. A data deve estar no
+        formato <i>timestamp</i>.</p>
+      <p class="mb-3">Exemplo de retorno de consulta:</p>
+      <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+        <thead>
+          <tr>
+            <th>id_transacao</th>
+            <th>id_item</th>
+            <th>data_transacao</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>43855</td>
+            <td>725</td>
+            <td>2001-08-01 00:00:00</td>
+          </tr>
+          <tr>
+            <td>43855</td>
+            <td>755</td>
+            <td>2001-08-01 00:00:00</td>
+          </tr>
+          <tr>
+            <td>43856</td>
+            <td>709</td>
+            <td>2001-08-01 00:00:00</td>
+          </tr>
+          <tr>
+            <td>43856</td>
+            <td>777</td>
+            <td>2001-08-01 00:00:00</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button">Fechar</button>
+    </footer>
   </div>
 </div>
 
