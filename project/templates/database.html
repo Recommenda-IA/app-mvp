@@ -47,7 +47,7 @@
     {% endif %}
     <div class="box">
       <div class="field">
-        <h2 class="subtitle">Informações de banco de dados</h2>
+        <h2 class="subtitle">Informações do banco de dados</h2>
         <p>Recomendável cadastrar um usuário com permissão de somente leitura.</p>
       </div>
       {% if data_database.db_user %}
@@ -95,6 +95,24 @@
                   <span class="icon is-small is-left">
                     <ion-icon name="server-outline"></ion-icon>
                   </span>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <h2 class="subtitle">Sistema gerenciador do banco de dados</h2>
+          </div>
+          <div class="field is-horizontal">
+            <div class="field-body">
+              <div class="field">
+                <p class="control is-expanded has-icons-left">
+                <div class="select">
+                  <select name="db_sgbd">
+                    <option value="mysql" {% if data_database.db_sgbd=="mysql" : %}selected{% endif %}>MySQL</option>
+                    <option value="postgresql" {% if data_database.db_sgbd=="postgresql" : %}selected{% endif %}>
+                      PostgreSQL</option>
+                  </select>
+                </div>
                 </p>
               </div>
             </div>

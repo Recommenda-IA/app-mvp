@@ -29,6 +29,7 @@ class Database_access(db.Model):
     db_name = db.Column(db.String(1000), nullable=False)
     db_host = db.Column(db.String(100), nullable=False)
     db_view = db.Column(db.String(100), nullable=False)
+    db_sgbd = db.Column(db.String(10), nullable=False)
     created_at = db.Column(
         db.DateTime, default=datetime_ist, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime_ist,

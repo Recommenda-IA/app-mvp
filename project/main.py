@@ -96,10 +96,11 @@ def database_action(action):
             db_password = request.form.get('db_password')
             db_host = request.form.get('db_host')
             db_name = request.form.get('db_name')
+            db_sgbd = request.form.get('db_sgbd')
             db_view = request.form.get('db_view')
 
             new_database = Database_access(db_user=db_user, user_id=current_user.id, db_host=db_host,
-                                           db_password=db_password, db_name=db_name, db_view=db_view)
+                                           db_password=db_password, db_name=db_name, db_view=db_view, db_sgbd=db_sgbd)
             db.session.add(new_database)
             db.session.commit()
 
