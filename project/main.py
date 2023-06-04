@@ -203,3 +203,44 @@ def training_action(action):
                 str(error_query.params), 'error'
 
     return render_template('dashboard/training-settings.html', name=current_user.name, error=error, data_training=data_training)
+
+
+@main.route('/upload')
+@login_required
+def upload():
+    error = ''
+
+    return render_template('dashboard/upload.html', name=current_user.name, error=error, data_training='')
+
+
+@main.route('/upload/create', methods=['POST'])
+@login_required
+def upload_create():
+    error = ''
+    arquivo = request.files['arquivo']
+
+    if arquivo.filename.endswith('.csv'):
+        # Processar arquivo CSV
+        linhas = arquivo.stream.read().decode('utf-8').splitlines()
+        rótulos = linhas[0].split(',')
+        dados = [linha.split(',') for linha in linhas[1:]]
+    else:
+        # Processar arquivo Excel
+        # Requer a biblioteca pandas e openpyxl
+        import pandas as pd
+        df = pd.read_excel(arquivo)
+        rótulos = df.columns.tolist()
+        dados = df.values.tolist()
+
+    if 'id_produto' in rótulos and 'nome_produto' in rótulos and 'preco_produto' in rótulos:
+        for linha in dados:
+            id_produto, nome_produto, preco_produto = linha
+            produto = Produto(
+                id_produto=id_produto, nome_produto=nome_produto, preco_produto=preco_produto)
+            db.session.add(produto)
+        db.session.commit()
+        return 'Dados salvos com sucesso!'
+    else:
+        return 'O arquivo não possui os rótulos necessários.'
+
+    return render_template('dashboard/upload.html', name=current_user.name, error=error, data_training='')
