@@ -47,8 +47,8 @@ def signup_post():
     password = request.form.get('password')
 
     # Cadastros desabilitados.
-    """ flash('Cadastros desabilitados')
-    return redirect(url_for('auth.signup')) """
+    flash('Cadastros desabilitados', 'error')
+    return redirect(url_for('auth.signup'))
 
     # if this returns a user, then the email already exists in database
     user = User.query.filter_by(email=email).first()
