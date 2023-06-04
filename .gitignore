@@ -4,3 +4,4 @@ migrations
 .env
 comandos.txt
 project/models/__pycache__/
+.vscode
