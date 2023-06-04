@@ -2,7 +2,7 @@
 
 from flask import Blueprint, render_template, request, flash
 from flask_login import login_required, current_user
-from .models.models import Database_access, Training
+from .models.models import Database_access, Training_frequency
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import exc, create_engine

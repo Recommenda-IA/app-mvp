@@ -38,13 +38,13 @@ class Database_access(db.Model):
                            onupdate=datetime_ist, nullable=False)
 
 
-class Training(db.Model):
+class Training_frequency(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'),
                         nullable=False)
     tr_activated = db.Column(db.Integer, default=0, nullable=False)
     tr_frequency = db.Column(db.Enum('daily', 'weekly', 'fortnightly', 'monthly',
-                             name='tr_frequency'), default='monthly', nullable=False)
+                             name='train_frequency'), default='monthly', nullable=False)
     created_at = db.Column(
         db.DateTime, default=datetime_ist, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime_ist,
