@@ -8,11 +8,19 @@
     <div class="column is-4 is-offset-4">
         <h3 class="title">Entrar</h3>
         <div class="box">
-            {% with messages = get_flashed_messages() %}
-            {% if messages %}
-            <div class="notification is-danger">
-                {{ messages[0] }}
-            </div>
+            {% with errors = get_flashed_messages(category_filter=["error"]) %}
+            {% if errors %}
+            {%- for msg in errors %}
+            <div class="notification is-danger">{{ msg }}</div>
+            {% endfor -%}
+            {% endif %}
+            {% endwith %}
+
+            {% with success = get_flashed_messages(category_filter=["success"]) %}
+            {% if success %}
+            {%- for msg in success %}
+            <div class="notification is-success">{{ msg }}</div>
+            {% endfor -%}
             {% endif %}
             {% endwith %}
             <form method="POST" action="/login">

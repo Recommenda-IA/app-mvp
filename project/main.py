@@ -114,7 +114,7 @@ def database_action(action):
             db.session.add(new_database)
             db.session.commit()
 
-            flash('Banco de dados cadastrado com sucesso.')
+            flash('Banco de dados cadastrado com sucesso.', 'success')
 
             error = ''
             data_database = Database_access.query.filter_by(
@@ -133,7 +133,7 @@ def database_action(action):
                     user_id=current_user.id).delete()
                 db.session.commit()
 
-                flash('Informações de banco de dados excluídas com sucesso.')
+                flash('Informações de banco de dados excluídas com sucesso.', 'success')
 
                 error = ''
                 data_database = Database_access.query.filter_by(
@@ -152,7 +152,7 @@ def database_action(action):
 @login_required
 def training():
     error = ''
-    data_training = Training.query.filter_by(
+    data_training = Training_frequency.query.filter_by(
         user_id=current_user.id).first()
 
     return render_template('dashboard/training-settings.html', name=current_user.name, error=error, data_training=data_training)
@@ -162,7 +162,7 @@ def training():
 @login_required
 def training_action(action):
     error = ''
-    data_training = Training.query.filter_by(
+    data_training = Training_frequency.query.filter_by(
         user_id=current_user.id).first()
 
     if action == 'create':
@@ -170,15 +170,15 @@ def training_action(action):
             tr_frequency = request.form.get('tr_frequency')
             tr_activated = request.form.get('tr_activated')
 
-            new_training = Training(
+            new_training = Training_frequency(
                 tr_frequency=tr_frequency, user_id=current_user.id, tr_activated=tr_activated)
             db.session.add(new_training)
             db.session.commit()
 
-            flash('Configurações salvas com sucesso.')
+            flash('Configurações salvas com sucesso.', 'success')
 
             error = ''
-            data_training = Training.query.filter_by(
+            data_training = Training_frequency.query.filter_by(
                 user_id=current_user.id).first()
 
         except exc.SQLAlchemyError as error_query:
@@ -192,10 +192,10 @@ def training_action(action):
 
             db.session.commit()
 
-            flash('Configurações atualizadas com sucesso.')
+            flash('Configurações atualizadas com sucesso.', 'success')
 
             error = ''
-            """ data_training = Training.query.filter_by(
+            """ data_training = Training_frequency.query.filter_by(
                     user_id=current_user.id).first() """
 
         except exc.SQLAlchemyError as error_query:

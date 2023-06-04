@@ -18,8 +18,8 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(1000), nullable=False)
     database_accesses = db.relationship(
         'Database_access', backref='user', lazy=True)
-    Training = db.relationship(
-        'Training', backref='user', lazy=True)
+    Training_frequency = db.relationship(
+        'Training_frequency', backref='user', lazy=True)
 
 
 class Database_access(db.Model):
