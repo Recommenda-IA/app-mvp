@@ -168,41 +168,94 @@
     <section class="modal-card-body">
       <p class="mb-1">Exemplo de view criada para obter os dados necessários para a análise:</p>
       <div class="mb-3">
-        <code>CREATE VIEW Transacoes AS SELECT b.SalesOrderID as <b>id_transacao</b>, b.ProductID as <b>id_item</b>, a.OrderDate as <b>data_transacao</b> FROM adventureworks.salesorderheader as a INNER JOIN adventureworks.salesorderdetail as b ON b.SalesOrderID = a.SalesOrderID;</code>
+        <code>CREATE VIEW Transacoes AS SELECT b.SalesOrderID as <b>id_transaction</b>, b.ProductID as <b>id_item</b>, REPLACE(c.Name, ',', '') as <b>name_item</b>, a.CustomerID as <b>customer_id</b>, a.OrderDate as <b>data_transaction</b>
+          FROM adventureworks.salesorderheader as a 
+          INNER JOIN adventureworks.salesorderdetail as b ON b.SalesOrderID = a.SalesOrderID
+          INNER JOIN adventureworks.product as c ON c.ProductID = b.ProductID;</code>
       </div>
-      <p class="mb-3">É obrigatório conter as colunas de identificadores de transacões, identificadores de itens das
-        transacões e data das transacões
-        nomeadas como <b>id_transacao</b>, <b>id_item</b> e <b>data_transacao</b>, respectivamente. A data deve estar no
+      <p class="mb-3">É obrigatório conter todas as colunas conforme nomeadas abaixo. A data deve estar no
         formato <i>timestamp</i>.</p>
       <p class="mb-3">Exemplo de retorno de consulta:</p>
       <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
         <thead>
           <tr>
-            <th>id_transacao</th>
+            <th>id_transaction</th>
             <th>id_item</th>
-            <th>data_transacao</th>
+            <th>name_item</th>
+            <th>customer_id</th>
+            <th>data_transaction</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>43855</td>
-            <td>725</td>
-            <td>2001-08-01 00:00:00</td>
+            <td>75123</td>
+            <td>712</td>
+            <td>AWC Logo Cap</td>
+            <td>18759</td>
+            <td>2004-07-31 00:00:00</td>
           </tr>
           <tr>
-            <td>43855</td>
-            <td>755</td>
-            <td>2001-08-01 00:00:00</td>
+            <td>75085</td>
+            <td>712</td>
+            <td>AWC Logo Cap</td>
+            <td>11927</td>
+            <td>2004-07-31 00:00:00</td>
           </tr>
           <tr>
-            <td>43856</td>
-            <td>709</td>
-            <td>2001-08-01 00:00:00</td>
+            <td>75086</td>
+            <td>877</td>
+            <td>Bike Wash - Dissolver</td>
+            <td>28789</td>
+            <td>2004-07-31 00:00:00</td>
           </tr>
           <tr>
-            <td>43856</td>
-            <td>777</td>
-            <td>2001-08-01 00:00:00</td>
+            <td>75087</td>
+            <td>707</td>
+            <td>Sport-100 Helmet Red</td>
+            <td>11794</td>
+            <td>2004-07-31 00:00:00</td>
+          </tr>
+          <tr>
+            <td>75088</td>
+            <td>713</td>
+            <td>Long-Sleeve Logo Jersey S</td>
+            <td>14680</td>
+            <td>2004-07-31 00:00:00</td>
+          </tr>
+          <tr>
+            <td>75088</td>
+            <td>711</td>
+            <td>Sport-100 Helmet Blue</td>
+            <td>14680</td>
+            <td>2004-07-31 00:00:00</td>
+          </tr>
+          <tr>
+            <td>75084</td>
+            <td>876</td>
+            <td>Hitch Rack - 4-Bike</td>
+            <td>11078</td>
+            <td>2004-07-31 00:00:00</td>
+          </tr>
+          <tr>
+            <td>75088</td>
+            <td>932</td>
+            <td>ML Road Tire</td>
+            <td>14680</td>
+            <td>2004-07-31 00:00:00</td>
+          </tr>
+          <tr>
+            <td>75088</td>
+            <td>922</td>
+            <td>Road Tire Tube</td>
+            <td>14680</td>
+            <td>2004-07-31 00:00:00</td>
+          </tr>
+          <tr>
+            <td>75089</td>
+            <td>931</td>
+            <td>LL Road Tire</td>
+            <td>19585</td>
+            <td>2004-07-31 00:00:00</td>
           </tr>
         </tbody>
       </table>

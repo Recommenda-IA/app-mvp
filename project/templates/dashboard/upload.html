@@ -27,19 +27,13 @@
       <div class="field">
         <h2 class="subtitle">Upload de arquivos CSV/Planilhas</h2>
       </div>
-      <form method="POST" action="{{ url_for('main.upload') }}" enctype="multipart/form-data">
+      <form method="POST" action="{{ url_for('main.upload_create') }}" enctype="multipart/form-data">
         <div class="field">
+          <a class="js-modal-trigger" data-target="view-example-csv">Clique aqui</a> para ver um exemplo de como deve
+          ser o padrão do arquivo CSV ou planilha.
+          <p class="has-text-danger mb-3">Obs.: Trate os dados para que não contenha vírgulas no nome dos produtos.</p>
           <input type="file" name="arquivo"
             accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-        </div>
-        <div class="field is-horizontal">
-          <div class="field-body">
-            <div class="field">
-              <p class="control is-expanded">
-
-              </p>
-            </div>
-          </div>
         </div>
         <div class="field">
           <div class="field-body">
@@ -52,6 +46,107 @@
     </div>
   </div>
 </div>
+</div>
+
+<div class="modal" id="view-example-csv">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Padrão para arquivo CSV e Excell</p>
+      <button class="delete" aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+      <p class="mb-3">É obrigatório conter todas as colunas conforme nomeadas abaixo, e seguir a mesma ordem
+        apresentada. A data deve estar no formato <i>timestamp</i>.</p>
+      <p class="mb-3">Exemplo dados de planilha:</p>
+      <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+        <thead>
+          <tr>
+            <th>id_transaction</th>
+            <th>id_item</th>
+            <th>name_item</th>
+            <th>customer_id</th>
+            <th>data_transaction</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>75123</td>
+            <td>712</td>
+            <td>AWC Logo Cap</td>
+            <td>18759</td>
+            <td>2004-07-31 00:00:00</td>
+          </tr>
+          <tr>
+            <td>75085</td>
+            <td>712</td>
+            <td>AWC Logo Cap</td>
+            <td>11927</td>
+            <td>2004-07-31 00:00:00</td>
+          </tr>
+          <tr>
+            <td>75086</td>
+            <td>877</td>
+            <td>Bike Wash - Dissolver</td>
+            <td>28789</td>
+            <td>2004-07-31 00:00:00</td>
+          </tr>
+          <tr>
+            <td>75087</td>
+            <td>707</td>
+            <td>Sport-100 Helmet Red</td>
+            <td>11794</td>
+            <td>2004-07-31 00:00:00</td>
+          </tr>
+          <tr>
+            <td>75088</td>
+            <td>713</td>
+            <td>Long-Sleeve Logo Jersey S</td>
+            <td>14680</td>
+            <td>2004-07-31 00:00:00</td>
+          </tr>
+          <tr>
+            <td>75088</td>
+            <td>711</td>
+            <td>Sport-100 Helmet Blue</td>
+            <td>14680</td>
+            <td>2004-07-31 00:00:00</td>
+          </tr>
+          <tr>
+            <td>75084</td>
+            <td>876</td>
+            <td>Hitch Rack - 4-Bike</td>
+            <td>11078</td>
+            <td>2004-07-31 00:00:00</td>
+          </tr>
+          <tr>
+            <td>75088</td>
+            <td>932</td>
+            <td>ML Road Tire</td>
+            <td>14680</td>
+            <td>2004-07-31 00:00:00</td>
+          </tr>
+          <tr>
+            <td>75088</td>
+            <td>922</td>
+            <td>Road Tire Tube</td>
+            <td>14680</td>
+            <td>2004-07-31 00:00:00</td>
+          </tr>
+          <tr>
+            <td>75089</td>
+            <td>931</td>
+            <td>LL Road Tire</td>
+            <td>19585</td>
+            <td>2004-07-31 00:00:00</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button">Fechar</button>
+    </footer>
+  </div>
 </div>
 
 {% endblock %}

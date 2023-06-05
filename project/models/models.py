@@ -49,3 +49,17 @@ class Training_frequency(db.Model):
         db.DateTime, default=datetime_ist, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime_ist,
                            onupdate=datetime_ist, nullable=False)
+
+
+class Transactions(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    id_transaction = db.Column(db.Integer, nullable=False)
+    id_item = db.Column(db.Integer, nullable=False)
+    customer_id = db.Column(db.Integer, nullable=False)
+    name_item = db.Column(db.String(150), nullable=False)
+    data_transaction = db.Column(
+        db.DateTime, nullable=False)
+    created_at = db.Column(
+        db.DateTime, default=datetime_ist, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime_ist,
+                           onupdate=datetime_ist, nullable=False)

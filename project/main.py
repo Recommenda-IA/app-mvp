@@ -2,7 +2,7 @@
 
 from flask import Blueprint, render_template, request, flash
 from flask_login import login_required, current_user
-from .models.models import Database_access, Training_frequency
+from .models.models import Database_access, Training_frequency, Transactions
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import exc, create_engine
@@ -222,25 +222,63 @@ def upload_create():
     if arquivo.filename.endswith('.csv'):
         # Processar arquivo CSV
         linhas = arquivo.stream.read().decode('utf-8').splitlines()
-        rótulos = linhas[0].split(',')
+        rotulos = linhas[0].split(',')
         dados = [linha.split(',') for linha in linhas[1:]]
     else:
         # Processar arquivo Excel
         # Requer a biblioteca pandas e openpyxl
         import pandas as pd
         df = pd.read_excel(arquivo)
-        rótulos = df.columns.tolist()
+        rotulos = df.columns.tolist()
         dados = df.values.tolist()
 
-    if 'id_produto' in rótulos and 'nome_produto' in rótulos and 'preco_produto' in rótulos:
-        for linha in dados:
-            id_produto, nome_produto, preco_produto = linha
-            produto = Produto(
-                id_produto=id_produto, nome_produto=nome_produto, preco_produto=preco_produto)
-            db.session.add(produto)
-        db.session.commit()
-        return 'Dados salvos com sucesso!'
-    else:
-        return 'O arquivo não possui os rótulos necessários.'
+    if 'id_transaction' not in rotulos:
+        error = 'Sem rótulo id_produto'
+        return render_template('dashboard/upload.html', name=current_user.name, error=error)
 
-    return render_template('dashboard/upload.html', name=current_user.name, error=error, data_training='')
+    if 'id_item' not in rotulos:
+        error = 'Sem rótulo id_item'
+        return render_template('dashboard/upload.html', name=current_user.name, error=error)
+
+    if 'name_item' not in rotulos:
+        error = 'Sem rótulo name_item'
+        return render_template('dashboard/upload.html', name=current_user.name, error=error)
+
+    if 'customer_id' not in rotulos:
+        error = 'Sem rótulo customer_id'
+        return render_template('dashboard/upload.html', name=current_user.name, error=error)
+
+    if 'data_transaction' not in rotulos:
+        error = 'Sem rótulo data_transaction'
+        return render_template('dashboard/upload.html', name=current_user.name, error=error)
+
+    for linha in dados:
+        if len(linha) != 5:
+            error = 'Dados incorretos. Verifique se os dados do arquivo seguem o padrão necessário ou se existem vírgulas entre os valores do arquivo.'
+            return render_template('dashboard/upload.html', name=current_user.name, error=error)
+
+        id_transaction, id_item, name_item, customer_id, data_transaction = linha
+        transaction = Transactions(
+            id_transaction=id_transaction,
+            id_item=id_item,
+            name_item=name_item,
+            customer_id=customer_id,
+            data_transaction=data_transaction
+        )
+        try:
+            db.session.add(transaction)
+            db.session.commit()
+        except exc.SQLAlchemyError as error_query:
+            error = str(error_query.orig) + " for parameters " + \
+                str(error_query.params), 'error'
+
+    flash('Dados salvos com sucesso!')
+    return render_template('dashboard/upload.html', name=current_user.name, error=error)
+
+
+@main.route('/view-data')
+@login_required
+def view_data():
+    error = ''
+
+    return render_template('dashboard/view-data.html', name=current_user.name, error=error, data_training='')

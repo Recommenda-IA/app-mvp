@@ -1,0 +1,120 @@
+<!-- templates/view-data.html -->
+
+{% extends "parts/base-intern.html" %}
+
+{% block content %}
+
+<div class="columns is-full">
+  <div class="column is-one-quarter">
+    {% include 'navigations/basket_analysis.html' %}
+  </div>
+  <div class="column">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="notification is-success">
+      <button class="delete"></button>
+      {{ messages[0] }}
+    </div>
+    {% endif %}
+    {% endwith %}
+    {% if error %}
+    <div class="notification is-danger">
+      <button class="delete"></button>
+      Erro: {{ error }}
+    </div>
+    {% endif %}
+    <div class="box">
+      <div class="field">
+        <h2 class="subtitle">Visualizar dados salvos</h2>
+      </div>
+      <div class="field">
+        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+          <thead>
+            <tr>
+              <th>id_transaction</th>
+              <th>id_item</th>
+              <th>name_item</th>
+              <th>customer_id</th>
+              <th>data_transaction</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>75123</td>
+              <td>712</td>
+              <td>AWC Logo Cap</td>
+              <td>18759</td>
+              <td>2004-07-31 00:00:00</td>
+            </tr>
+            <tr>
+              <td>75085</td>
+              <td>712</td>
+              <td>AWC Logo Cap</td>
+              <td>11927</td>
+              <td>2004-07-31 00:00:00</td>
+            </tr>
+            <tr>
+              <td>75086</td>
+              <td>877</td>
+              <td>Bike Wash - Dissolver</td>
+              <td>28789</td>
+              <td>2004-07-31 00:00:00</td>
+            </tr>
+            <tr>
+              <td>75087</td>
+              <td>707</td>
+              <td>Sport-100 Helmet Red</td>
+              <td>11794</td>
+              <td>2004-07-31 00:00:00</td>
+            </tr>
+            <tr>
+              <td>75088</td>
+              <td>713</td>
+              <td>Long-Sleeve Logo Jersey S</td>
+              <td>14680</td>
+              <td>2004-07-31 00:00:00</td>
+            </tr>
+            <tr>
+              <td>75088</td>
+              <td>711</td>
+              <td>Sport-100 Helmet Blue</td>
+              <td>14680</td>
+              <td>2004-07-31 00:00:00</td>
+            </tr>
+            <tr>
+              <td>75084</td>
+              <td>876</td>
+              <td>Hitch Rack - 4-Bike</td>
+              <td>11078</td>
+              <td>2004-07-31 00:00:00</td>
+            </tr>
+            <tr>
+              <td>75088</td>
+              <td>932</td>
+              <td>ML Road Tire</td>
+              <td>14680</td>
+              <td>2004-07-31 00:00:00</td>
+            </tr>
+            <tr>
+              <td>75088</td>
+              <td>922</td>
+              <td>Road Tire Tube</td>
+              <td>14680</td>
+              <td>2004-07-31 00:00:00</td>
+            </tr>
+            <tr>
+              <td>75089</td>
+              <td>931</td>
+              <td>LL Road Tire</td>
+              <td>19585</td>
+              <td>2004-07-31 00:00:00</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+{% endblock %}
