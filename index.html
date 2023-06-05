@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Visualização de Rede</title>
+  <style>
+    .node {
+      stroke: #fff;
+      stroke-width: 2px;
+    }
+
+    .link {
+      stroke: #999;
+      stroke-opacity: 0.6;
+    }
+
+    .network1 {
+      width: 600px;
+      height: 600px;
+      overflow: auto;
+      border: 1px solid #bbb;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="network1">
+    <svg width="500" height="500"></svg>
+  </div>
+
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script>
+    var scaleValue = 1;
+    // Dados de exemplo
+    var nodes = [
+      { name: "Node 1" },
+      { name: "Node 2" },
+      { name: "Node 3" },
+      { name: "Node 4" }
+    ];
+
+    var links = [
+      { source: 0,target: 1,value: 10 },
+      { source: 1,target: 2,value: 5 },
+      { source: 2,target: 3,value: 8 },
+      { source: 3,target: 0,value: 12 }
+    ];
+
+    // Configuração do layout de força
+    var simulation = d3.forceSimulation(nodes)
+      .force("charge",d3.forceManyBody().strength(-100))
+      .force("link",d3.forceLink(links).id(function (d,i) { return i; }))
+      .force("center",d3.forceCenter(250,250));
+
+    // Criar o elemento SVG
+    var svg = d3.select("svg")
+      .attr("width",500)
+      .attr("height",500)
+      .attr("transform","scale(1)");
+
+    // Criar as linhas de ligação
+    var link = svg.selectAll(".link")
+      .data(links)
+      .enter().append("line")
+      .attr("class","link")
+      .style("stroke-width",function (d) { return d.value; });
+
+    // Criar os nós
+    var node = svg.selectAll(".node")
+      .data(nodes)
+      .enter().append("circle")
+      .attr("class","node")
+      .attr("r",10);
+
+    // Adicionar o nome dos nós
+    var label = svg.selectAll(".label")
+      .data(nodes)
+      .enter().append("text")
+      .attr("class","label")
+      .attr("dx",12)
+      .attr("dy",4)
+      .text(function (d) { return d.name; });
+
+    // Atualizar a posição dos elementos a cada iteração
+    simulation.on("tick",function () {
+      link
+        .attr("x1",function (d) { return d.source.x; })
+        .attr("y1",function (d) { return d.source.y; })
+        .attr("x2",function (d) { return d.target.x; })
+        .attr("y2",function (d) { return d.target.y; });
+
+      node
+        .attr("cx",function (d) { return d.x; })
+        .attr("cy",function (d) { return d.y; });
+
+      label
+        .attr("x",function (d) { return d.x; })
+        .attr("y",function (d) { return d.y; });
+    });
+
+    // Funções de controle de zoom
+    function zoomIn() {
+      scaleValue = scaleValue + 0.20;
+      svg.attr("transform","scale(" + (scaleValue) + ")");
+    }
+
+    function zoomOut() {
+      scaleValue = scaleValue - 0.20;
+      svg.attr("transform","scale(" + (scaleValue) + ")");
+    }
+  </script>
+
+  <!-- Botões de controle de zoom -->
+  <button onclick="zoomIn()">Zoom In</button>
+  <button onclick="zoomOut()">Zoom Out</button>
+</body>
+
+</html>
