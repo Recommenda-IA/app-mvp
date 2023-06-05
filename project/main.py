@@ -1,6 +1,7 @@
 # main.py
 
 from flask import Blueprint, render_template, request, flash
+from flask_paginate import Pagination, get_page_parameter
 from flask_login import login_required, current_user
 from .models.models import Database_access, Training_frequency, Transactions
 from . import db
@@ -281,4 +282,17 @@ def upload_create():
 def view_data():
     error = ''
 
-    return render_template('dashboard/view-data.html', name=current_user.name, error=error, data_training='')
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    per_page = 25
+
+    pagination = Transactions.query.order_by(Transactions.created_at.desc()).paginate(
+        page=page, per_page=per_page)
+    transactions = pagination.items
+    pagination_range = pagination.iter_pages(
+        left_edge=2,
+        left_current=2,
+        right_current=3,
+        right_edge=2
+    )
+
+    return render_template('dashboard/view-data.html', name=current_user.name, error=error, transactions=transactions, pagination=pagination, pagination_range=pagination_range)

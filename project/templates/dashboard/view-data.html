@@ -31,86 +31,52 @@
         <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
           <thead>
             <tr>
-              <th>id_transaction</th>
-              <th>id_item</th>
-              <th>name_item</th>
-              <th>customer_id</th>
-              <th>data_transaction</th>
+              <th>Id de transação</th>
+              <th>Id do item</th>
+              <th>Nome</th>
+              <th>Id do cliente</th>
+              <th>Data da transação</th>
+              <th>Data de importação</th>
             </tr>
           </thead>
           <tbody>
+            {% for transaction in transactions %}
             <tr>
-              <td>75123</td>
-              <td>712</td>
-              <td>AWC Logo Cap</td>
-              <td>18759</td>
-              <td>2004-07-31 00:00:00</td>
+              <td>{{ transaction.id_transaction }}</td>
+              <td>{{ transaction.id_item }}</td>
+              <td>{{ transaction.name_item }}</td>
+              <td>{{ transaction.customer_id }}</td>
+              <td>{{ transaction.data_transaction.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+              <td>{{ transaction.created_at.strftime('%d/%m/%Y %H:%M:%S') }}</td>
             </tr>
-            <tr>
-              <td>75085</td>
-              <td>712</td>
-              <td>AWC Logo Cap</td>
-              <td>11927</td>
-              <td>2004-07-31 00:00:00</td>
-            </tr>
-            <tr>
-              <td>75086</td>
-              <td>877</td>
-              <td>Bike Wash - Dissolver</td>
-              <td>28789</td>
-              <td>2004-07-31 00:00:00</td>
-            </tr>
-            <tr>
-              <td>75087</td>
-              <td>707</td>
-              <td>Sport-100 Helmet Red</td>
-              <td>11794</td>
-              <td>2004-07-31 00:00:00</td>
-            </tr>
-            <tr>
-              <td>75088</td>
-              <td>713</td>
-              <td>Long-Sleeve Logo Jersey S</td>
-              <td>14680</td>
-              <td>2004-07-31 00:00:00</td>
-            </tr>
-            <tr>
-              <td>75088</td>
-              <td>711</td>
-              <td>Sport-100 Helmet Blue</td>
-              <td>14680</td>
-              <td>2004-07-31 00:00:00</td>
-            </tr>
-            <tr>
-              <td>75084</td>
-              <td>876</td>
-              <td>Hitch Rack - 4-Bike</td>
-              <td>11078</td>
-              <td>2004-07-31 00:00:00</td>
-            </tr>
-            <tr>
-              <td>75088</td>
-              <td>932</td>
-              <td>ML Road Tire</td>
-              <td>14680</td>
-              <td>2004-07-31 00:00:00</td>
-            </tr>
-            <tr>
-              <td>75088</td>
-              <td>922</td>
-              <td>Road Tire Tube</td>
-              <td>14680</td>
-              <td>2004-07-31 00:00:00</td>
-            </tr>
-            <tr>
-              <td>75089</td>
-              <td>931</td>
-              <td>LL Road Tire</td>
-              <td>19585</td>
-              <td>2004-07-31 00:00:00</td>
-            </tr>
+            {% endfor %}
           </tbody>
         </table>
+        <div class="pagination">
+          {% if pagination.has_prev %}
+          <a href="{{ url_for('main.view_data', page=pagination.prev_num) }}">Anterior</a>
+          {% else %}
+          <span class="disabled">Anterior</span>
+          {% endif %}
+
+          {% for page in pagination_range %}
+          {% if page %}
+          {% if pagination.page == page %}
+          <span class="current-page">{{ page }}</span>
+          {% else %}
+          <a href="{{ url_for('main.view_data', page=page) }}">{{ page }}</a>
+          {% endif %}
+          {% else %}
+          <span class="ellipsis">...</span>
+          {% endif %}
+          {% endfor %}
+
+          {% if pagination.has_next %}
+          <a href="{{ url_for('main.view_data', page=pagination.next_num) }}">Próximo</a>
+          {% else %}
+          <span class="disabled">Próximo</span>
+          {% endif %}
+        </div>
       </div>
     </div>
   </div>
