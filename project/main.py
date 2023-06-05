@@ -264,7 +264,8 @@ def upload_create():
             id_item=id_item,
             name_item=name_item,
             customer_id=customer_id,
-            data_transaction=data_transaction
+            data_transaction=data_transaction,
+            user_id=current_user.id
         )
         try:
             db.session.add(transaction)
@@ -296,3 +297,34 @@ def view_data():
     )
 
     return render_template('dashboard/view-data.html', name=current_user.name, error=error, transactions=transactions, pagination=pagination, pagination_range=pagination_range)
+
+
+@main.route('/data-management')
+def data_management():
+    error = ''
+
+    return render_template('dashboard/data-management.html', name=current_user.name)
+
+
+@main.route('/data-management/delete', methods=['POST'])
+def data_management_delete():
+    error = ''
+
+    try:
+        db_delete = request.form.get('db_delete')
+        if db_delete == 'deletar informações':
+            Transactions.query.filter_by(
+                user_id=current_user.id).delete()
+            db.session.commit()
+
+            flash('Informações de transações excluídas com sucesso.', 'success')
+
+            error = ''
+        else:
+            error = 'Por favor, digite "deletar informações" para confirmar a exclusão de informações.'
+
+    except exc.SQLAlchemyError as error_query:
+        error = str(error_query.orig) + " for parameters " + \
+            str(error_query.params), 'error'
+
+    return render_template('dashboard/data-management.html', name=current_user.name, error=error)

@@ -56,6 +56,7 @@ class Transactions(db.Model):
     id_transaction = db.Column(db.Integer, nullable=False)
     id_item = db.Column(db.Integer, nullable=False)
     customer_id = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, nullable=False)
     name_item = db.Column(db.String(150), nullable=False)
     data_transaction = db.Column(
         db.DateTime, nullable=False)

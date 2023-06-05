@@ -1,0 +1,51 @@
+<!-- templates/data-management.html -->
+
+{% extends "parts/base-intern.html" %}
+
+{% block content %}
+
+<div class="columns is-full">
+  <div class="column is-one-quarter">
+    {% include 'navigations/basket_analysis.html' %}
+  </div>
+  <div class="column">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="notification is-success">
+      <button class="delete"></button>
+      {{ messages[0] }}
+    </div>
+    {% endif %}
+    {% endwith %}
+    {% if error %}
+    <div class="notification is-danger">
+      <button class="delete"></button>
+      Erro: {{ error }}
+    </div>
+    {% endif %}
+    <div class="box">
+      <div class="field">
+        <h2 class="subtitle">Gerenciamento de dados</h2>
+      </div>
+      <div class="field">
+        <form method="POST" action="{{ url_for('main.data_management_delete') }}">
+      </div>
+      <div class="field">
+        <div class="field-body">
+          <div class="notification p-2 is-danger is-light">
+            <p class="mb-2"><small>Para deletar as informações, digite <i>deletar informações</i></small></p>
+            <input class="input is-small is-2 mb-2" type="text" name="db_delete">
+            <button class="button is-danger" type="submit">
+              Excluir
+            </button>
+          </div>
+        </div>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+{% endblock %}
