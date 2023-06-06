@@ -9,20 +9,7 @@
     {% include 'navigations/basket_analysis.html' %}
   </div>
   <div class="column">
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <div class="notification is-success">
-      <button class="delete"></button>
-      {{ messages[0] }}
-    </div>
-    {% endif %}
-    {% endwith %}
-    {% if error %}
-    <div class="notification is-danger">
-      <button class="delete"></button>
-      Erro: {{ error }}
-    </div>
-    {% endif %}
+    {% include 'parts/alerts.html' %}
     {% if data_database.db_user %}
     <div class="box">
       <h2 class="subtitle">Status do banco de dados</h2>

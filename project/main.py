@@ -76,32 +76,6 @@ def database():
 @main.route('/database/<action>', methods=['POST'])
 @login_required
 def database_action(action):
-    error = ''
-    error_db_user = ''
-    data_database = Database_access.query.filter_by(
-        user_id=current_user.id).first()
-    database_user_conected = False
-
-    if data_database:
-        usuario_db = data_database.db_user
-        senha_db = data_database.db_password
-        host_db = data_database.db_host
-        database = data_database.db_name
-
-        if data_database.db_sgbd == 'mysql':
-            engine = create_engine(
-                f"mysql+mysqlconnector://{usuario_db}:{senha_db}@{host_db}/{database}", connect_args={'connect_timeout': 5})
-
-        if data_database.db_sgbd == 'postgresql':
-            engine = create_engine(
-                f"postgresql+psycopg2://{usuario_db}:{senha_db}@{host_db}/{database}", connect_args={'connect_timeout': 5})
-
-        try:
-            conn = engine.connect()
-            database_user_conected = True
-        except exc.SQLAlchemyError as query_error:
-            error_db_user = str(query_error.orig) + " for parameters " + \
-                str(query_error.params)
 
     if action == 'create':
         try:
@@ -119,14 +93,9 @@ def database_action(action):
 
             flash('Banco de dados cadastrado com sucesso.', 'success')
 
-            error = ''
-            data_database = Database_access.query.filter_by(
-                user_id=current_user.id).first()
-            database_user_conected = True
-
         except exc.SQLAlchemyError as error_query:
-            error = str(error_query.orig) + " for parameters " + \
-                str(error_query.params), 'error'
+            flash(str(error_query.orig) + " for parameters " +
+                  str(error_query.params), 'error')
 
     if action == 'delete':
         try:
@@ -137,36 +106,29 @@ def database_action(action):
                 db.session.commit()
 
                 flash('Informações de banco de dados excluídas com sucesso.', 'success')
-
-                error = ''
-                data_database = Database_access.query.filter_by(
-                    user_id=current_user.id).first()
             else:
-                error = 'Por favor, digite "deletar banco de dados" para confirmar a exclusão de informações.'
+                flash(
+                    'Por favor, digite "deletar banco de dados" para confirmar a exclusão de informações.', 'error')
 
         except exc.SQLAlchemyError as error_query:
-            error = str(error_query.orig) + " for parameters " + \
-                str(error_query.params), 'error'
+            flash(str(error_query.orig) + " for parameters " +
+                  str(error_query.params), 'error')
 
-    return render_template('dashboard/database.html', name=current_user.name, error=error, data_database=data_database, database_user_conected=database_user_conected, error_db_user=error_db_user)
+    return redirect(url_for('main.database'))
 
 
 @main.route('/training-settings')
 @login_required
 def training():
-    error = ''
     data_training = Training_frequency.query.filter_by(
         user_id=current_user.id).first()
 
-    return render_template('dashboard/training-settings.html', name=current_user.name, error=error, data_training=data_training)
+    return render_template('dashboard/training-settings.html', name=current_user.name, data_training=data_training)
 
 
 @main.route('/training-settings/<action>', methods=['POST'])
 @login_required
 def training_action(action):
-    error = ''
-    data_training = Training_frequency.query.filter_by(
-        user_id=current_user.id).first()
 
     if action == 'create':
         try:
@@ -180,16 +142,14 @@ def training_action(action):
 
             flash('Configurações salvas com sucesso.', 'success')
 
-            error = ''
-            data_training = Training_frequency.query.filter_by(
-                user_id=current_user.id).first()
-
         except exc.SQLAlchemyError as error_query:
-            error = str(error_query.orig) + " for parameters " + \
-                str(error_query.params), 'error'
+            flash(str(error_query.orig) + " for parameters " +
+                  str(error_query.params), 'error')
 
     if action == 'update':
         try:
+            data_training = Training_frequency.query.filter_by(
+                user_id=current_user.id).first()
             data_training.tr_frequency = request.form.get('tr_frequency')
             data_training.tr_activated = request.form.get('tr_activated')
 
@@ -197,29 +157,22 @@ def training_action(action):
 
             flash('Configurações atualizadas com sucesso.', 'success')
 
-            error = ''
-            """ data_training = Training_frequency.query.filter_by(
-                    user_id=current_user.id).first() """
-
         except exc.SQLAlchemyError as error_query:
-            error = str(error_query.orig) + " for parameters " + \
-                str(error_query.params), 'error'
+            flash(str(error_query.orig) + " for parameters " +
+                  str(error_query.params), 'error')
 
-    return render_template('dashboard/training-settings.html', name=current_user.name, error=error, data_training=data_training)
+    return redirect(url_for('main.training'))
 
 
 @main.route('/upload')
 @login_required
 def upload():
-    error = ''
-
-    return render_template('dashboard/upload.html', name=current_user.name, error=error)
+    return render_template('dashboard/upload.html', name=current_user.name)
 
 
 @main.route('/upload/create', methods=['POST'])
 @login_required
 def upload_create():
-    error = ''
     arquivo = request.files['arquivo']
 
     if arquivo.filename.endswith('.csv'):
@@ -236,29 +189,29 @@ def upload_create():
         dados = df.values.tolist()
 
     if 'id_transaction' not in rotulos:
-        error = 'Sem rótulo id_produto'
-        return render_template('dashboard/upload.html', name=current_user.name, error=error)
+        flash('Sem rótulo id_transaction', 'error')
+        return redirect(url_for('main.upload'))
 
     if 'id_item' not in rotulos:
-        error = 'Sem rótulo id_item'
-        return render_template('dashboard/upload.html', name=current_user.name, error=error)
+        flash('Sem rótulo id_item', 'error')
+        return redirect(url_for('main.upload'))
 
     if 'name_item' not in rotulos:
-        error = 'Sem rótulo name_item'
-        return render_template('dashboard/upload.html', name=current_user.name, error=error)
+        flash('Sem rótulo name_item', 'error')
+        return redirect(url_for('main.upload'))
 
     if 'customer_id' not in rotulos:
-        error = 'Sem rótulo customer_id'
-        return render_template('dashboard/upload.html', name=current_user.name, error=error)
+        flash('Sem rótulo customer_id', 'error')
+        return redirect(url_for('main.upload'))
 
     if 'data_transaction' not in rotulos:
-        error = 'Sem rótulo data_transaction'
-        return render_template('dashboard/upload.html', name=current_user.name, error=error)
+        flash('Sem rótulo data_transaction', 'error')
+        return redirect(url_for('main.upload'))
 
     for linha in dados:
         if len(linha) != 5:
-            error = 'Dados incorretos. Verifique se os dados do arquivo seguem o padrão necessário ou se existem vírgulas entre os valores do arquivo.'
-            return render_template('dashboard/upload.html', name=current_user.name, error=error)
+            flash('Dados incorretos. Verifique se os dados do arquivo seguem o padrão necessário ou se existem vírgulas entre os valores do arquivo.', 'error')
+            return redirect(url_for('main.upload'))
 
         id_transaction, id_item, name_item, customer_id, data_transaction = linha
         transaction = Transactions(
@@ -273,17 +226,16 @@ def upload_create():
             db.session.add(transaction)
             db.session.commit()
         except exc.SQLAlchemyError as error_query:
-            error = str(error_query.orig) + " for parameters " + \
-                str(error_query.params), 'error'
+            flash(str(error_query.orig) + " for parameters " +
+                  str(error_query.params), 'error')
 
-    flash('Dados salvos com sucesso!')
-    return render_template('dashboard/upload.html', name=current_user.name, error=error)
+    flash('Dados salvos com sucesso!', 'success')
+    return redirect(url_for('main.upload'))
 
 
 @main.route('/view-data')
 @login_required
 def view_data():
-    error = ''
 
     if Transactions.query.filter_by(user_id=current_user.id).count() == 0:
         message = 'Sem registros.'
@@ -302,7 +254,7 @@ def view_data():
             right_edge=2
         )
 
-        return render_template('dashboard/view-data.html', name=current_user.name, error=error, transactions=transactions, pagination=pagination, pagination_range=pagination_range)
+        return render_template('dashboard/view-data.html', name=current_user.name, transactions=transactions, pagination=pagination, pagination_range=pagination_range)
 
 
 @main.route('/data-management')
@@ -335,15 +287,13 @@ def data_management_delete():
 @main.route('/api-users')
 @login_required
 def api_users():
-    error = ''
-    message = ''
 
     if User_api.query.filter_by(user_id=current_user.id).count() == 0:
         message = 'Sem registros para usuários API.'
-        return render_template('dashboard/api-users.html', name=current_user.name, error=error, message=message)
+        return render_template('dashboard/api-users.html', name=current_user.name, message=message)
     else:
         data_users = User_api.query.filter_by(user_id=current_user.id)
-        return render_template('dashboard/api-users.html', name=current_user.name, error=error, data_users=data_users)
+        return render_template('dashboard/api-users.html', name=current_user.name, data_users=data_users)
 
 
 @main.route('/api-users/<action>', methods=['POST'])
@@ -370,7 +320,7 @@ def api_users_actions(action):
 
         except exc.SQLAlchemyError as error_query:
             flash(str(error_query.orig) + " for parameters " +
-                  str(error_query.params), 'error', 'error')
+                  str(error_query.params), 'error')
 
     if action == 'delete':
         try:
