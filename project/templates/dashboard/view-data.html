@@ -28,6 +28,7 @@
         <h2 class="subtitle">Visualizar dados salvos</h2>
       </div>
       <div class="field">
+        {% if transactions %}
         <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
           <thead>
             <tr>
@@ -77,6 +78,9 @@
           <span class="disabled">Próximo</span>
           {% endif %}
         </div>
+        {% else %}
+        <p>{{ message }}</p>
+        {% endif %}
       </div>
     </div>
   </div>

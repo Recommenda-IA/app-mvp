@@ -56,30 +56,51 @@
       <div class="field">
         <h2 class="subtitle">Usuários de API</h2>
       </div>
-      <div class="field">
+      {% if data_users %}
+      <form action="/api-users/delete" method="POST">
+        <div class=" field">
+          <div class="field-body">
+            <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Nome de usuário</th>
+                  <th>Chave de API</th>
+                  <th>Data de criação</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for user in data_users %}
+                <tr>
+                  <td><input type="checkbox" name="api_user[]" value="{{ user.id }}" id="{{ user.id }}"></td>
+                  <td>{{ user.username }}</td>
+                  <td>{{ user.hash }}</td>
+                  <td>{{ user.created_at.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-body">
+            <div class="notification p-2 is-danger is-light">
+              <p class="mb-2"><small>Para deletar as informações, digite <i>deletar usuário</i></small></p>
+              <input class="input is-small is-2 mb-2" type="text" name="users_delete">
+              <button class="button is-danger" type="submit">
+                Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+      {% else %}
+      <div class=" field">
         <div class="field-body">
-          <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
-            <thead>
-              <tr>
-                <th>Nome de usuário</th>
-                <th>Chave de API</th>
-                <th>Data de criação</th>
-                <th>Ação</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for user in data_users %}
-              <tr>
-                <td>{{ user.username }}</td>
-                <td>{{ user.hash }}</td>
-                <td>{{ user.created_at.strftime('%d/%m/%Y %H:%M:%S') }}</td>
-                <td>Excluir</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+          <p>{{ message }}</p>
         </div>
       </div>
+      {% endif %}
     </div>
   </div>
 </div>

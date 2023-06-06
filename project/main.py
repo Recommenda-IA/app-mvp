@@ -285,20 +285,24 @@ def upload_create():
 def view_data():
     error = ''
 
-    page = request.args.get(get_page_parameter(), type=int, default=1)
-    per_page = 25
+    if Transactions.query.filter_by(user_id=current_user.id).count() == 0:
+        message = 'Sem registros.'
+        return render_template('dashboard/view-data.html', name=current_user.name, message=message)
+    else:
+        page = request.args.get(get_page_parameter(), type=int, default=1)
+        per_page = 30
 
-    pagination = Transactions.query.order_by(Transactions.created_at.desc()).paginate(
-        page=page, per_page=per_page)
-    transactions = pagination.items
-    pagination_range = pagination.iter_pages(
-        left_edge=2,
-        left_current=2,
-        right_current=3,
-        right_edge=2
-    )
+        pagination = Transactions.query.order_by(Transactions.created_at.desc()).paginate(
+            page=page, per_page=per_page)
+        transactions = pagination.items
+        pagination_range = pagination.iter_pages(
+            left_edge=2,
+            left_current=2,
+            right_current=3,
+            right_edge=2
+        )
 
-    return render_template('dashboard/view-data.html', name=current_user.name, error=error, transactions=transactions, pagination=pagination, pagination_range=pagination_range)
+        return render_template('dashboard/view-data.html', name=current_user.name, error=error, transactions=transactions, pagination=pagination, pagination_range=pagination_range)
 
 
 @main.route('/data-management')
@@ -336,16 +340,21 @@ def data_management_delete():
 @login_required
 def api_users():
     error = ''
-    data_users = User_api.query.filter_by(user_id=current_user.id)
+    message = ''
 
-    return render_template('dashboard/api-users.html', name=current_user.name, error=error, data_users=data_users)
+    if User_api.query.filter_by(user_id=current_user.id).count() == 0:
+        message = 'Sem registros para usuários API.'
+        return render_template('dashboard/api-users.html', name=current_user.name, error=error, message=message)
+    else:
+        data_users = User_api.query.filter_by(user_id=current_user.id)
+        return render_template('dashboard/api-users.html', name=current_user.name, error=error, data_users=data_users)
 
 
 @main.route('/api-users/<action>', methods=['POST'])
 @login_required
 def api_users_actions(action):
     error = ''
-    data_users = User_api.query.filter_by(user_id=current_user.id)
+    message = ''
 
     if action == 'create':
         try:
@@ -363,13 +372,49 @@ def api_users_actions(action):
                 db.session.add(user)
                 db.session.commit()
 
-                flash('Configurações salvas com sucesso.', 'success')
+                flash('Usuário de API criado com sucesso.', 'success')
 
-                error = ''
                 data_users = User_api.query.filter_by(user_id=current_user.id)
+
+                if not data_users:
+                    message = 'Sem registros para usuários API.'
+                    return render_template('dashboard/api-users.html', name=current_user.name, error=error, message=message)
 
         except exc.SQLAlchemyError as error_query:
             error = str(error_query.orig) + " for parameters " + \
                 str(error_query.params), 'error'
 
-    return render_template('dashboard/api-users.html', name=current_user.name, error=error, data_users=data_users)
+    if action == 'delete':
+        try:
+            users_delete = request.form.get('users_delete')
+            if users_delete == 'deletar usuário':
+                name = request.form.get('api_user')
+                user_id = current_user.id
+
+                user_ids = request.form.getlist('api_user[]')
+                for user_id in user_ids:
+                    user = User_api.query.get(user_id)
+                    if user:
+                        db.session.delete(user)
+
+                db.session.commit()
+
+                flash('Usuário(s) excluído(s) com sucesso.', 'success')
+
+                if User_api.query.filter_by(user_id=current_user.id).count() == 0:
+                    message = 'Sem registros para usuários API.'
+                    return render_template('dashboard/api-users.html', name=current_user.name, error=error, message=message)
+            else:
+                error = 'Por favor, digite "deletar usuário" para confirmar a exclusão de usuários.'
+
+            data_users = User_api.query.filter_by(user_id=current_user.id)
+
+            if not data_users:
+                message = 'Sem registros para usuários API.'
+                return render_template('dashboard/api-users.html', name=current_user.name, error=error, message=message)
+
+        except exc.SQLAlchemyError as error_query:
+            error = str(error_query.orig) + " for parameters " + \
+                str(error_query.params), 'error'
+
+    return render_template('dashboard/api-users.html', name=current_user.name, error=error, data_users=data_users, message=message)
