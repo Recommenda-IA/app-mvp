@@ -1,6 +1,6 @@
 # main.py
 
-from flask import Blueprint, render_template, request, flash
+from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_paginate import Pagination, get_page_parameter
 from flask_login import login_required, current_user
 from .models.models import Database_access, Training_frequency, Transactions, User_api
@@ -307,15 +307,12 @@ def view_data():
 
 @main.route('/data-management')
 def data_management():
-    error = ''
 
     return render_template('dashboard/data-management.html', name=current_user.name)
 
 
 @main.route('/data-management/delete', methods=['POST'])
 def data_management_delete():
-    error = ''
-
     try:
         db_delete = request.form.get('db_delete')
         if db_delete == 'deletar informações':
@@ -324,16 +321,15 @@ def data_management_delete():
             db.session.commit()
 
             flash('Informações de transações excluídas com sucesso.', 'success')
-
-            error = ''
         else:
-            error = 'Por favor, digite "deletar informações" para confirmar a exclusão de informações.'
+            flash(
+                'Por favor, digite "deletar informações" para confirmar a exclusão de informações.', 'error')
 
     except exc.SQLAlchemyError as error_query:
-        error = str(error_query.orig) + " for parameters " + \
-            str(error_query.params), 'error'
+        flash(str(error_query.orig) + " for parameters " +
+              str(error_query.params), 'error')
 
-    return render_template('dashboard/data-management.html', name=current_user.name, error=error)
+    return redirect(url_for('main.data_management'))
 
 
 @main.route('/api-users')
@@ -353,8 +349,6 @@ def api_users():
 @main.route('/api-users/<action>', methods=['POST'])
 @login_required
 def api_users_actions(action):
-    error = ''
-    message = ''
 
     if action == 'create':
         try:
@@ -362,7 +356,7 @@ def api_users_actions(action):
             user_id = current_user.id
 
             if User_api.query.filter_by(user_id=user_id).count() >= 5:
-                error = 'Limite de registros atingido para esta conta.'
+                flash('Limite de registros atingido para esta conta.', 'error')
             else:
                 current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 hash_value = 'sk-' + md5(current_time.encode()).hexdigest()
@@ -374,15 +368,9 @@ def api_users_actions(action):
 
                 flash('Usuário de API criado com sucesso.', 'success')
 
-                data_users = User_api.query.filter_by(user_id=current_user.id)
-
-                if not data_users:
-                    message = 'Sem registros para usuários API.'
-                    return render_template('dashboard/api-users.html', name=current_user.name, error=error, message=message)
-
         except exc.SQLAlchemyError as error_query:
-            error = str(error_query.orig) + " for parameters " + \
-                str(error_query.params), 'error'
+            flash(str(error_query.orig) + " for parameters " +
+                  str(error_query.params), 'error', 'error')
 
     if action == 'delete':
         try:
@@ -400,21 +388,12 @@ def api_users_actions(action):
                 db.session.commit()
 
                 flash('Usuário(s) excluído(s) com sucesso.', 'success')
-
-                if User_api.query.filter_by(user_id=current_user.id).count() == 0:
-                    message = 'Sem registros para usuários API.'
-                    return render_template('dashboard/api-users.html', name=current_user.name, error=error, message=message)
             else:
-                error = 'Por favor, digite "deletar usuário" para confirmar a exclusão de usuários.'
-
-            data_users = User_api.query.filter_by(user_id=current_user.id)
-
-            if not data_users:
-                message = 'Sem registros para usuários API.'
-                return render_template('dashboard/api-users.html', name=current_user.name, error=error, message=message)
+                flash(
+                    'Por favor, digite "deletar usuário" para confirmar a exclusão de usuários.', 'error')
 
         except exc.SQLAlchemyError as error_query:
-            error = str(error_query.orig) + " for parameters " + \
-                str(error_query.params), 'error'
+            flash(str(error_query.orig) + " for parameters " +
+                  str(error_query.params), 'error')
 
-    return render_template('dashboard/api-users.html', name=current_user.name, error=error, data_users=data_users, message=message)
+    return redirect(url_for('main.api_users'))

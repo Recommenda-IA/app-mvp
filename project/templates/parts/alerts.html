@@ -1,0 +1,23 @@
+<div class="alerts mb-2">
+    {% with errors = get_flashed_messages(category_filter=["error"]) %}
+    {% if errors %}
+    {%- for msg in errors %}
+    <div class="notification is-danger">
+        <button class="delete"></button>
+        Erro: {{ msg }}
+    </div>
+    {% endfor -%}
+    {% endif %}
+    {% endwith %}
+
+    {% with success = get_flashed_messages(category_filter=["success"]) %}
+    {% if success %}
+    {%- for msg in success %}
+    <div class="notification is-success">
+        <button class="delete"></button>
+        {{ msg }}
+    </div>
+    {% endfor -%}
+    {% endif %}
+    {% endwith %}
+</div>
