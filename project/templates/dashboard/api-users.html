@@ -1,0 +1,100 @@
+<!-- templates/api-users.html -->
+
+{% extends "parts/base-intern.html" %}
+
+{% block content %}
+
+<div class="columns is-full">
+  <div class="column is-one-quarter">
+    {% include 'navigations/basket_analysis.html' %}
+  </div>
+  <div class="column">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="notification is-success">
+      <button class="delete"></button>
+      {{ messages[0] }}
+    </div>
+    {% endif %}
+    {% endwith %}
+    {% if error %}
+    <div class="notification is-danger">
+      <button class="delete"></button>
+      Erro: {{ error }}
+    </div>
+    {% endif %}
+    <div class="box">
+      <div class="field">
+        <h2 class="subtitle">Criar usuário de API</h2>
+      </div>
+      <div class="field is-horizontal">
+        <form action="/api-users/create" method="POST" onsubmit="return validateInput()">
+          <div class="field-body">
+            <div class="field">
+              <p class="control is-expanded has-icons-left">
+                <input class="input" type="text" id="api_user" name="api_user" placeholder="Usuário do banco de dados"
+                  value="">
+                <span class="icon is-small is-left">
+                  <ion-icon name="person-outline"></ion-icon>
+                </span>
+              </p>
+            </div>
+            <div class="field">
+              <button class="button is-info" type="submit">
+                Salvar
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="field">
+        <div class="field-body">
+        </div>
+      </div>
+    </div>
+    <div class="box">
+      <div class="field">
+        <h2 class="subtitle">Usuários de API</h2>
+      </div>
+      <div class="field">
+        <div class="field-body">
+          <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+            <thead>
+              <tr>
+                <th>Nome de usuário</th>
+                <th>Chave de API</th>
+                <th>Data de criação</th>
+                <th>Ação</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for user in data_users %}
+              <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.hash }}</td>
+                <td>{{ user.created_at.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+                <td>Excluir</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+  function validateInput() {
+    var input = document.getElementById("api_user").value;
+    var regex = /^[a-zA-Z]{1,10}$/;
+    var isValid = regex.test(input);
+    if (!isValid) {
+      alert("O usuário deve conter apenas letras e ter no máximo 10 caracteres.");
+    }
+    return isValid;
+  }
+</script>
+
+{% endblock %}

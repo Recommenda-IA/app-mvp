@@ -3,10 +3,12 @@
 from flask import Blueprint, render_template, request, flash
 from flask_paginate import Pagination, get_page_parameter
 from flask_login import login_required, current_user
-from .models.models import Database_access, Training_frequency, Transactions
+from .models.models import Database_access, Training_frequency, Transactions, User_api
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import exc, create_engine
+from hashlib import md5
+from datetime import datetime
 
 main = Blueprint('main', __name__)
 
@@ -211,7 +213,7 @@ def training_action(action):
 def upload():
     error = ''
 
-    return render_template('dashboard/upload.html', name=current_user.name, error=error, data_training='')
+    return render_template('dashboard/upload.html', name=current_user.name, error=error)
 
 
 @main.route('/upload/create', methods=['POST'])
@@ -328,3 +330,46 @@ def data_management_delete():
             str(error_query.params), 'error'
 
     return render_template('dashboard/data-management.html', name=current_user.name, error=error)
+
+
+@main.route('/api-users')
+@login_required
+def api_users():
+    error = ''
+    data_users = User_api.query.filter_by(user_id=current_user.id)
+
+    return render_template('dashboard/api-users.html', name=current_user.name, error=error, data_users=data_users)
+
+
+@main.route('/api-users/<action>', methods=['POST'])
+@login_required
+def api_users_actions(action):
+    error = ''
+    data_users = User_api.query.filter_by(user_id=current_user.id)
+
+    if action == 'create':
+        try:
+            name = request.form.get('api_user')
+            user_id = current_user.id
+
+            if User_api.query.filter_by(user_id=user_id).count() >= 5:
+                error = 'Limite de registros atingido para esta conta.'
+            else:
+                current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                hash_value = 'sk-' + md5(current_time.encode()).hexdigest()
+
+                user = User_api(username=name, hash=hash_value,
+                                user_id=user_id)
+                db.session.add(user)
+                db.session.commit()
+
+                flash('Configurações salvas com sucesso.', 'success')
+
+                error = ''
+                data_users = User_api.query.filter_by(user_id=current_user.id)
+
+        except exc.SQLAlchemyError as error_query:
+            error = str(error_query.orig) + " for parameters " + \
+                str(error_query.params), 'error'
+
+    return render_template('dashboard/api-users.html', name=current_user.name, error=error, data_users=data_users)

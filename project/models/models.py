@@ -64,3 +64,14 @@ class Transactions(db.Model):
         db.DateTime, default=datetime_ist, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime_ist,
                            onupdate=datetime_ist, nullable=False)
+
+
+class User_api(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(10), nullable=False)
+    hash = db.Column(db.String(100), nullable=False)
+    user_id = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(
+        db.DateTime, default=datetime_ist, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime_ist,
+                           onupdate=datetime_ist, nullable=False)
