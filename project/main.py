@@ -9,6 +9,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import exc, create_engine
 from hashlib import md5
 from datetime import datetime
+from mlxtend.frequent_patterns import apriori, association_rules
+from pymongo import MongoClient
+import pandas as pd
+import os
 
 main = Blueprint('main', __name__)
 
@@ -347,3 +351,66 @@ def api_users_actions(action):
                   str(error_query.params), 'error')
 
     return redirect(url_for('main.api_users'))
+
+
+# -------- TREINAMENTO -------------------
+
+# Configuração do MongoDB
+client = MongoClient(
+    f"mongodb+srv://{os.environ['MONGO_DB_USER']}:{os.environ['MONGO_DB_PASSWORD']}@recommendacluster.crluiz4.mongodb.net/?retryWrites=true&w=majority")
+db_mongo = client['associations']
+collection = db_mongo['associations_data']
+
+# Função para buscar, filtrar e salvar as regras de associação no MongoDB
+
+
+def save_association_rules(user_id, start_date, end_date):
+    # Consulta no banco de dados filtrando pelo user_id e intervalo de data
+    transactions = Transactions.query.filter_by(user_id=user_id).filter(
+        Transactions.data_transaction.between(start_date, end_date)).all()
+
+    # Criação do DataFrame a partir dos dados das transações
+    df = pd.DataFrame([(t.id_transaction, t.id_item)
+                      for t in transactions], columns=['id_transaction', 'id_item'])
+
+    tabulacao_itens = (pd.crosstab(df['id_transaction'], df['id_item'])
+                       .clip(upper=1)
+                       .reset_index()
+                       .rename_axis(None, axis=1))
+
+    if 'id_transaction' in tabulacao_itens.columns:
+        del tabulacao_itens['id_transaction']
+
+    # Aplicação do algoritmo Apriori para encontrar os itens frequentes
+    frequent_itemsets = apriori(
+        tabulacao_itens.astype('bool'), min_support=0.1, use_colnames=True)
+
+    # Criação das regras de associação a partir dos itens frequentes
+    rules = association_rules(
+        frequent_itemsets, metric="support", min_threshold=0.1)
+
+    # Salvando as regras de associação no MongoDB
+    for _, rule in rules.iterrows():
+        association_data = {
+            'user_id': user_id,
+            'antecedent': ','.join(str(num) for num in set(rule['antecedents'])),
+            'consequent': ','.join(str(num) for num in set(rule['consequents'])),
+            'support': rule['support'],
+            'confidence': rule['confidence'],
+            'lift': rule['lift']
+        }
+
+        collection.insert_one(association_data)
+
+# Rota para executar a função save_association_rules
+
+
+@main.route('/association-rules')
+def run_association_rules():
+    user_id = 4
+    start_date = '2001-06-30'
+    end_date = '2001-07-02'
+
+    save_association_rules(user_id, start_date, end_date)
+
+    return 'Association rules saved successfully.'
