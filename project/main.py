@@ -10,7 +10,7 @@ from sqlalchemy import exc, create_engine
 from hashlib import md5
 from datetime import datetime
 from mlxtend.frequent_patterns import apriori, association_rules
-from pymongo import MongoClient
+from pymongo import MongoClient, IndexModel, ASCENDING
 import pandas as pd
 import os
 
@@ -359,7 +359,16 @@ def api_users_actions(action):
 client = MongoClient(
     f"mongodb+srv://{os.environ['MONGO_DB_USER']}:{os.environ['MONGO_DB_PASSWORD']}@recommendacluster.crluiz4.mongodb.net/?retryWrites=true&w=majority")
 db_mongo = client['associations']
+# Configurar o índice para a coleção
 collection = db_mongo['associations_data']
+collection.create_indexes([
+    IndexModel([('user_id', ASCENDING)]),
+    IndexModel([('antecedents', ASCENDING)]),
+    IndexModel([('support', ASCENDING)]),
+    IndexModel([('confidence', ASCENDING)]),
+    IndexModel([('lift', ASCENDING)]),
+    IndexModel([('consequent', ASCENDING)])
+])
 
 # Função para buscar, filtrar e salvar as regras de associação no MongoDB
 
@@ -371,7 +380,7 @@ def save_association_rules(user_id, start_date, end_date):
 
     # Criação do DataFrame a partir dos dados das transações
     df = pd.DataFrame([(t.id_transaction, t.id_item)
-                      for t in transactions], columns=['id_transaction', 'id_item'])
+                       for t in transactions], columns=['id_transaction', 'id_item'])
 
     tabulacao_itens = (pd.crosstab(df['id_transaction'], df['id_item'])
                        .clip(upper=1)
@@ -389,12 +398,19 @@ def save_association_rules(user_id, start_date, end_date):
     rules = association_rules(
         frequent_itemsets, metric="support", min_threshold=0.1)
 
+    # Ordenar cada resultado de antecedente em ordem crescente
+    rules['antecedents'] = rules['antecedents'].apply(
+        lambda x: tuple(sorted(x)))
+
+    # Remover regras com antecedentes duplicados
+    rules = rules.drop_duplicates(subset='antecedents')
+
     # Salvando as regras de associação no MongoDB
     for _, rule in rules.iterrows():
         association_data = {
             'user_id': user_id,
-            'antecedent': ','.join(str(num) for num in set(rule['antecedents'])),
-            'consequent': ','.join(str(num) for num in set(rule['consequents'])),
+            'antecedents': tuple(rule['antecedents']),
+            'consequent': tuple(rule['consequents']),
             'support': rule['support'],
             'confidence': rule['confidence'],
             'lift': rule['lift']
@@ -407,10 +423,20 @@ def save_association_rules(user_id, start_date, end_date):
 
 @main.route('/association-rules')
 def run_association_rules():
+
+    inicio = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
     user_id = 4
     start_date = '2001-06-30'
     end_date = '2001-07-02'
 
+    print('-------')
+    print(f'Início: {inicio}')
+    print('-------')
+
     save_association_rules(user_id, start_date, end_date)
+
+    print(f'Fim: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
+    print('-------')
 
     return 'Association rules saved successfully.'
