@@ -37,12 +37,12 @@ def remove_redundant_rules(rules):
     return filtered_rules
 
 
-def get_association_rules(user_id, transactions_df):
+def create_association_rules(user_id, transactions_df):
     # Configuração do MongoDB
     client = MongoClient(os.environ['MONGODBURL'])
     db_mongo = client['associations']
-    # Configurar o índice para a coleção
     collection = db_mongo['associations_data']
+    # Configurar o índice para a coleção
     collection.create_indexes([
         IndexModel([('user_id', ASCENDING)]),
         IndexModel([('antecedents', ASCENDING)]),
