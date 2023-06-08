@@ -470,14 +470,14 @@ def save_association_rules(user_id, start_date, end_date):
 # Rota para executar a função save_association_rules
 
 
-@main.route('/association-rules')
+@main.route('/association-rules', methods=['POST'])
 def run_association_rules():
 
     inicio = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    user_id = 4
-    start_date = '2001-06-30'
-    end_date = '2001-07-02'
+    user_id = 1
+    start_date = '2000-06-30'
+    end_date = '2003-07-02'
 
     print('-------')
     print(f'Início: {inicio}')
