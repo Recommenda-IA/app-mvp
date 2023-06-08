@@ -5,3 +5,4 @@ migrations
 comandos.txt
 project/models/__pycache__/
 .vscode
+project/helpers/__pycache__/

@@ -3,17 +3,13 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_paginate import Pagination, get_page_parameter
 from flask_login import login_required, current_user
-from .models.models import Database_access, Training_frequency, Transactions, User_api, Training_status
-from . import db
-from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import exc, create_engine
 from hashlib import md5
 from datetime import datetime
-from mlxtend.frequent_patterns import apriori, association_rules
-from pymongo import MongoClient, IndexModel, ASCENDING
 import pandas as pd
-import os
-import json
+from .helpers.freq_rules import get_association_rules
+from .models.models import Database_access, Training_frequency, Transactions, User_api, Training_status
+from . import db
 
 main = Blueprint('main', __name__)
 
@@ -353,120 +349,6 @@ def api_users_actions(action):
 
     return redirect(url_for('main.api_users'))
 
-
-# -------- TREINAMENTO -------------------
-
-# Configuração do MongoDB
-client = MongoClient(os.environ['MONGODBURL'])
-db_mongo = client['associations']
-# Configurar o índice para a coleção
-collection = db_mongo['associations_data']
-collection.create_indexes([
-    IndexModel([('user_id', ASCENDING)]),
-    IndexModel([('antecedents', ASCENDING)]),
-    IndexModel([('support', ASCENDING)]),
-    IndexModel([('confidence', ASCENDING)]),
-    IndexModel([('lift', ASCENDING)]),
-    IndexModel([('consequent', ASCENDING)])
-])
-
-# Função para buscar, filtrar e salvar as regras de associação no MongoDB
-
-
-def save_association_rules(user_id, start_date, end_date):
-    # Armazenar informações de status de treinamento
-    status_data = {
-        'start': datetime.now(),
-        'end': None,
-        'status': None,
-        'message': None
-    }
-
-    try:
-        # Consulta no banco de dados filtrando pelo user_id e intervalo de data
-        transactions = Transactions.query.filter_by(user_id=user_id).filter(
-            Transactions.data_transaction.between(start_date, end_date)).all()
-
-        # Criação do DataFrame a partir dos dados das transações
-        df = pd.DataFrame([(t.id_transaction, t.id_item)
-                           for t in transactions], columns=['id_transaction', 'id_item'])
-
-        tabulacao_itens = (pd.crosstab(df['id_transaction'], df['id_item'])
-                           .clip(upper=1)
-                           .reset_index()
-                           .rename_axis(None, axis=1))
-
-        if 'id_transaction' in tabulacao_itens.columns:
-            del tabulacao_itens['id_transaction']
-
-        # Aplicação do algoritmo Apriori para encontrar os itens frequentes
-        frequent_itemsets = apriori(
-            tabulacao_itens.astype('bool'), min_support=0.12, use_colnames=True)
-
-        # Criação das regras de associação a partir dos itens frequentes
-        rules = association_rules(
-            frequent_itemsets, metric="support", min_threshold=0.1)
-
-        # Ordenar cada resultado de antecedente em ordem crescente
-        rules['antecedents'] = rules['antecedents'].apply(
-            lambda x: tuple(sorted(x)))
-
-        # Remover regras com antecedentes duplicados
-        # rules = rules.drop_duplicates(subset='antecedents')
-
-        # Salvando as regras de associação no MongoDB
-        unsaved_records = []
-        record_buffer = []
-        for _, rule in rules.iterrows():
-            association_data = {
-                'user_id': user_id,
-                'antecedents': tuple(rule['antecedents']),
-                'consequents': tuple(rule['consequents']),
-                'support': rule['support'],
-                'confidence': rule['confidence'],
-                'lift': rule['lift']
-            }
-
-            record_buffer.append(association_data)
-
-            # Inserir registros acumulados quando atingir 1000
-            if len(record_buffer) == 10000:
-                try:
-                    collection.insert_many(record_buffer)
-                except Exception as e:
-                    unsaved_records.extend(record_buffer)
-
-                record_buffer = []
-
-        # Inserir registros remanescentes
-        if record_buffer:
-            try:
-                collection.insert_many(record_buffer)
-            except Exception as e:
-                unsaved_records.extend(record_buffer)
-
-        # Salvando registros não salvos em um arquivo JSON
-        if unsaved_records:
-            current_date = datetime.now().strftime('%Y-%m-%d')
-            filename = f"{user_id}_{current_date}.json"
-            filepath = os.path.join("json_temp", filename)
-            with open(filepath, 'w') as file:
-                json.dump(unsaved_records, file)
-
-        # Atualizar informações de status
-        status_data['end'] = datetime.now()
-        status_data['status'] = 'success'
-
-    except Exception as e:
-        # Atualizar informações de status em caso de erro
-        status_data['end'] = datetime.now()
-        status_data['status'] = 'error'
-        status_data['message'] = str(e)
-
-    # Salvar informações de status na tabela training_status
-    Training_status.query.filter_by(user_id=user_id).update(status_data)
-    db.session.commit()
-
 # Rota para executar a função save_association_rules
 
 
@@ -483,7 +365,30 @@ def run_association_rules():
     print(f'Início: {inicio}')
     print('-------')
 
-    save_association_rules(user_id, start_date, end_date)
+    training_status = Training_status(
+        user_id=user_id,
+        start=datetime.now(),
+        status='working'
+    )
+    db.session.add(training_status)
+    db.session.commit()
+    training_status_id = training_status.id
+
+    # Consulta no banco de dados filtrando pelo user_id e intervalo de data
+    transactions = Transactions.query.filter_by(user_id=user_id).filter(
+        Transactions.data_transaction.between(start_date, end_date)).all()
+
+    # Criação do DataFrame a partir dos dados das transações
+    transactions_df = pd.DataFrame([(t.id_transaction, t.id_item)
+                                    for t in transactions], columns=['id_transaction', 'id_item'])
+
+    # Chamar a função get_association_rules
+    status_data = get_association_rules(
+        user_id, transactions_df)
+
+    # Salvar as informações de status na tabela Training_status
+    Training_status.query.filter_by(id=training_status_id).update(status_data)
+    db.session.commit()
 
     print(f'Fim: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
     print('-------')

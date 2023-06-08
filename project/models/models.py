@@ -125,9 +125,9 @@ class Training_status(db.Model):
     status = db.Column(db.String(50))
     message = db.Column(db.String(200))
 
-    def __init__(self, user_id, start):
+    def __init__(self, user_id, start, status):
         self.user_id = user_id
         self.start = start
         self.end = None
-        self.status = None
+        self.status = status
         self.message = None
