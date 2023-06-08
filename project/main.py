@@ -357,8 +357,7 @@ def api_users_actions(action):
 # -------- TREINAMENTO -------------------
 
 # Configuração do MongoDB
-client = MongoClient(
-    f"mongodb+srv://{os.environ['MONGO_DB_USER']}:{os.environ['MONGO_DB_PASSWORD']}@recommendacluster.crluiz4.mongodb.net/?retryWrites=true&w=majority")
+client = MongoClient(os.environ['MONGODBURL'])
 db_mongo = client['associations']
 # Configurar o índice para a coleção
 collection = db_mongo['associations_data']
