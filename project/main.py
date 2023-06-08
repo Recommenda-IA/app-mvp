@@ -401,7 +401,7 @@ def save_association_rules(user_id, start_date, end_date):
 
         # Aplicação do algoritmo Apriori para encontrar os itens frequentes
         frequent_itemsets = apriori(
-            tabulacao_itens.astype('bool'), min_support=0.1, use_colnames=True)
+            tabulacao_itens.astype('bool'), min_support=0.12, use_colnames=True)
 
         # Criação das regras de associação a partir dos itens frequentes
         rules = association_rules(
@@ -412,7 +412,7 @@ def save_association_rules(user_id, start_date, end_date):
             lambda x: tuple(sorted(x)))
 
         # Remover regras com antecedentes duplicados
-        rules = rules.drop_duplicates(subset='antecedents')
+        # rules = rules.drop_duplicates(subset='antecedents')
 
         # Salvando as regras de associação no MongoDB
         unsaved_records = []
@@ -421,7 +421,7 @@ def save_association_rules(user_id, start_date, end_date):
             association_data = {
                 'user_id': user_id,
                 'antecedents': tuple(rule['antecedents']),
-                'consequent': tuple(rule['consequents']),
+                'consequents': tuple(rule['consequents']),
                 'support': rule['support'],
                 'confidence': rule['confidence'],
                 'lift': rule['lift']
@@ -430,7 +430,7 @@ def save_association_rules(user_id, start_date, end_date):
             record_buffer.append(association_data)
 
             # Inserir registros acumulados quando atingir 1000
-            if len(record_buffer) == 1000:
+            if len(record_buffer) == 10000:
                 try:
                     collection.insert_many(record_buffer)
                 except Exception as e:
