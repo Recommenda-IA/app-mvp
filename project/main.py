@@ -389,7 +389,7 @@ def run_association_rules():
 
     user_id = 1
     start_date = '2000-06-30'
-    end_date = '2003-07-02'
+    end_date = '2010-07-02'
 
     print('-------')
     print(f'Início: {inicio}')
