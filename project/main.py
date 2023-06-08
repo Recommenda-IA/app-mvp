@@ -234,6 +234,32 @@ def upload_create():
     return redirect(url_for('main.upload'))
 
 
+@main.route('/status-training')
+@login_required
+def status_training():
+    total_transactions = Transactions.query.filter_by(
+        user_id=current_user.id).count()
+
+    if total_transactions == 0:
+        message = 'Sem registros.'
+        return render_template('dashboard/view-data.html', name=current_user.name, message=message)
+    else:
+        page = request.args.get(get_page_parameter(), type=int, default=1)
+        per_page = 30
+
+        pagination = Transactions.query.order_by(Transactions.created_at.desc()).paginate(
+            page=page, per_page=per_page)
+        transactions = pagination.items
+        pagination_range = pagination.iter_pages(
+            left_edge=2,
+            left_current=2,
+            right_current=3,
+            right_edge=2
+        )
+
+        return render_template('dashboard/view-training.html', name=current_user.name, transactions=transactions, pagination=pagination, pagination_range=pagination_range, total_transactions=total_transactions)
+
+
 @main.route('/view-data')
 @login_required
 def view_data():
@@ -261,6 +287,7 @@ def view_data():
 
 
 @main.route('/data-management')
+@login_required
 def data_management():
     total_transactions = Transactions.query.filter_by(
         user_id=current_user.id).count()
@@ -269,6 +296,7 @@ def data_management():
 
 
 @main.route('/data-management/delete', methods=['POST'])
+@login_required
 def data_management_delete():
     try:
         db_delete = request.form.get('db_delete')
@@ -352,8 +380,6 @@ def api_users_actions(action):
                   str(error_query.params), 'error')
 
     return redirect(url_for('main.api_users'))
-
-# Rota para executar a função save_association_rules
 
 
 @main.route('/association-rules', methods=['POST'])
