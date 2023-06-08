@@ -262,15 +262,17 @@ def view_data():
 
 @main.route('/data-management')
 def data_management():
+    total_transactions = Transactions.query.filter_by(
+        user_id=current_user.id).count()
 
-    return render_template('dashboard/data-management.html', name=current_user.name)
+    return render_template('dashboard/data-management.html', name=current_user.name, total_transactions=total_transactions)
 
 
 @main.route('/data-management/delete', methods=['POST'])
 def data_management_delete():
     try:
         db_delete = request.form.get('db_delete')
-        if db_delete == 'deletar informações':
+        if db_delete == 'deletar transações':
             Transactions.query.filter_by(
                 user_id=current_user.id).delete()
             db.session.commit()

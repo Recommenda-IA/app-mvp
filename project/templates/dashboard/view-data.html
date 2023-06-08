@@ -12,7 +12,8 @@
     {% include 'parts/alerts.html' %}
     <div class="box">
       <div class="field">
-        <h2 class="subtitle">Visualizar dados salvos - {{ total_transactions }} transações</h2>
+        <h2 class="subtitle">Visualizar dados salvos {% if total_transactions %} - {{ total_transactions }} transações{%
+          endif %}</h2>
       </div>
       <div class="field">
         {% if transactions %}
