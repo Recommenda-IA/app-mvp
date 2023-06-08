@@ -182,33 +182,26 @@ def upload_create():
         linhas = arquivo.stream.read().decode('utf-8').splitlines()
         rotulos = linhas[0].split(',')
         dados = [linha.split(',') for linha in linhas[1:]]
-    else:
+    elif arquivo.filename.endswith('.xlsx') or arquivo.filename.endswith('.xls'):
         # Processar arquivo Excel
-        # Requer a biblioteca pandas e openpyxl
         import pandas as pd
-        df = pd.read_excel(arquivo)
-        rotulos = df.columns.tolist()
-        dados = df.values.tolist()
-
-    if 'id_transaction' not in rotulos:
-        flash('Sem rótulo id_transaction', 'error')
+        try:
+            df = pd.read_excel(arquivo)
+            rotulos = df.columns.tolist()
+            dados = df.values.tolist()
+        except Exception as e:
+            flash('Erro ao processar o arquivo Excel: ' + str(e), 'error')
+            return redirect(url_for('main.upload'))
+    else:
+        flash('Formato de arquivo inválido. O arquivo deve ser CSV ou Excel.', 'error')
         return redirect(url_for('main.upload'))
 
-    if 'id_item' not in rotulos:
-        flash('Sem rótulo id_item', 'error')
-        return redirect(url_for('main.upload'))
-
-    if 'name_item' not in rotulos:
-        flash('Sem rótulo name_item', 'error')
-        return redirect(url_for('main.upload'))
-
-    if 'customer_id' not in rotulos:
-        flash('Sem rótulo customer_id', 'error')
-        return redirect(url_for('main.upload'))
-
-    if 'data_transaction' not in rotulos:
-        flash('Sem rótulo data_transaction', 'error')
-        return redirect(url_for('main.upload'))
+    required_labels = ['id_transaction', 'id_item',
+                       'name_item', 'customer_id', 'data_transaction']
+    for label in required_labels:
+        if label not in rotulos:
+            flash('Sem rótulo ' + label, 'error')
+            return redirect(url_for('main.upload'))
 
     for linha in dados:
         if len(linha) != 5:
