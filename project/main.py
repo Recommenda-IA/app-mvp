@@ -68,8 +68,8 @@ def database():
             conn = engine.connect()
             database_user_conected = True
         except exc.SQLAlchemyError as query_error:
-            error_db_user = str(query_error.orig) + " for parameters " + \
-                str(query_error.params)
+            error_db_user = str(query_error.orig.args) + \
+                " for parameters " + str(query_error.params)
 
     return render_template('dashboard/database.html', name=current_user.name, data_database=data_database, error=error, error_db_user=error_db_user, database_user_conected=database_user_conected)
 
@@ -95,7 +95,7 @@ def database_action(action):
             flash('Banco de dados cadastrado com sucesso.', 'success')
 
         except exc.SQLAlchemyError as error_query:
-            flash(str(error_query.orig) + " for parameters " +
+            flash(str(error_query.orig.args) + " for parameters " +
                   str(error_query.params), 'error')
 
     if action == 'delete':
@@ -112,7 +112,7 @@ def database_action(action):
                     'Por favor, digite "deletar banco de dados" para confirmar a exclusão de informações.', 'error')
 
         except exc.SQLAlchemyError as error_query:
-            flash(str(error_query.orig) + " for parameters " +
+            flash(str(error_query.orig.args) + " for parameters " +
                   str(error_query.params), 'error')
 
     return redirect(url_for('main.database'))
@@ -144,7 +144,7 @@ def training_action(action):
             flash('Configurações salvas com sucesso.', 'success')
 
         except exc.SQLAlchemyError as error_query:
-            flash(str(error_query.orig) + " for parameters " +
+            flash(str(error_query.orig.args) + " for parameters " +
                   str(error_query.params), 'error')
 
     if action == 'update':
@@ -159,7 +159,7 @@ def training_action(action):
             flash('Configurações atualizadas com sucesso.', 'success')
 
         except exc.SQLAlchemyError as error_query:
-            flash(str(error_query.orig) + " for parameters " +
+            flash(str(error_query.orig.args) + " for parameters " +
                   str(error_query.params), 'error')
 
     return redirect(url_for('main.training'))
@@ -227,7 +227,7 @@ def upload_create():
             db.session.add(transaction)
             db.session.commit()
         except exc.SQLAlchemyError as error_query:
-            flash(str(error_query.orig) + " for parameters " +
+            flash(str(error_query.orig.args) + " for parameters " +
                   str(error_query.params), 'error')
 
     flash('Dados salvos com sucesso!', 'success')
@@ -279,7 +279,7 @@ def data_management_delete():
                 'Por favor, digite "deletar informações" para confirmar a exclusão de informações.', 'error')
 
     except exc.SQLAlchemyError as error_query:
-        flash(str(error_query.orig) + " for parameters " +
+        flash(str(error_query.orig.args) + " for parameters " +
               str(error_query.params), 'error')
 
     return redirect(url_for('main.data_management'))
@@ -320,7 +320,7 @@ def api_users_actions(action):
                 flash('Usuário de API criado com sucesso.', 'success')
 
         except exc.SQLAlchemyError as error_query:
-            flash(str(error_query.orig) + " for parameters " +
+            flash(str(error_query.orig.args) + " for parameters " +
                   str(error_query.params), 'error')
 
     if action == 'delete':
@@ -344,7 +344,7 @@ def api_users_actions(action):
                     'Por favor, digite "deletar usuário" para confirmar a exclusão de usuários.', 'error')
 
         except exc.SQLAlchemyError as error_query:
-            flash(str(error_query.orig) + " for parameters " +
+            flash(str(error_query.orig.args) + " for parameters " +
                   str(error_query.params), 'error')
 
     return redirect(url_for('main.api_users'))
