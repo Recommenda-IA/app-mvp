@@ -12,31 +12,32 @@
     {% include 'parts/alerts.html' %}
     <div class="box">
       <div class="field">
-        <h2 class="subtitle">Visualizar dados salvos {% if total_transactions %} - {{ total_transactions }} transações{%
-          endif %}</h2>
+        <h2 class="subtitle">Histórico de treinamentos</h2>
       </div>
       <div class="field">
-        {% if transactions %}
+        {% if trainings %}
         <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
           <thead>
             <tr>
-              <th>Id de transação</th>
-              <th>Id do item</th>
-              <th>Nome</th>
-              <th>Id do cliente</th>
-              <th>Data da transação</th>
-              <th>Data de importação</th>
+              <th>Id</th>
+              <th>Status</th>
+              <th>Data de início</th>
+              <th>Data de término</th>
+              <th>Mensagem</th>
             </tr>
           </thead>
           <tbody>
-            {% for transaction in transactions %}
+            {% for training in trainings %}
             <tr>
-              <td>{{ transaction.id_transaction }}</td>
-              <td>{{ transaction.id_item }}</td>
-              <td>{{ transaction.name_item }}</td>
-              <td>{{ transaction.customer_id }}</td>
-              <td>{{ transaction.data_transaction.strftime('%d/%m/%Y %H:%M:%S') }}</td>
-              <td>{{ transaction.created_at.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+              <td>{{ training.id }}</td>
+              <td>
+                <span
+                  class="{% if training.status == 'working' %}has-text-warning{% elif training.status == 'success' %}has-text-success{% elif training.status == 'error' %}has-text-danger{% endif %}">{{
+                  training.status }}</span>
+              </td>
+              <td>{{ training.start.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+              <td>{% if training.end %}{{ training.end.strftime('%d/%m/%Y %H:%M:%S') }}{% else %}-{% endif %}</td>
+              <td>{% if training.message %}{{ training.message }}{% else %}-{% endif %}</td>
             </tr>
             {% endfor %}
           </tbody>

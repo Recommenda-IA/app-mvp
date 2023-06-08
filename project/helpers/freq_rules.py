@@ -72,11 +72,11 @@ def get_association_rules(user_id, transactions_df):
 
         # Aplicação do algoritmo Apriori para encontrar os itens frequentes
         frequent_itemsets = fpgrowth(
-            tabulacao_itens.astype('bool'), min_support=0.15, use_colnames=True)
+            tabulacao_itens.astype('bool'), min_support=0.05, use_colnames=True)
 
         # Criação das regras de associação a partir dos itens frequentes
         rules = association_rules(
-            frequent_itemsets, metric="support", min_threshold=0.1)
+            frequent_itemsets, metric="support", min_threshold=0.05)
 
         # Remover regras redundantes
         rules = remove_redundant_rules(rules)

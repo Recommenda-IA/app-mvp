@@ -19,7 +19,7 @@ def create_app():
     app = Flask(__name__)
 
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-    app.config['SECRET_KEY'] = '12345'
+    app.config['SECRET_KEY'] = os.environ['F_SECRET_KEY']
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -33,7 +33,7 @@ def create_app():
     @login_manager.user_loader
     def load_user(user_id):
         # since the user_id is just the primary key of our user table, use it in the query for the user
-        return User.query.get(int(user_id))
+        return db.session.get(User, int(user_id))
 
     # blueprint for auth routes in our app
     from .auth import auth as auth_blueprint

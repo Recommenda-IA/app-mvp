@@ -19,8 +19,33 @@
           <a class="js-modal-trigger" data-target="view-example-csv">Clique aqui</a> para ver um exemplo de como deve
           ser o padrão do arquivo CSV ou planilha.
           <p class="has-text-danger mb-3">Obs.: Trate os dados para que não contenha vírgulas no nome dos produtos.</p>
-          <input type="file" name="arquivo"
-            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+          <div id="file-js-example" class="file has-name">
+            <label class="file-label">
+              <input class="file-input" type="file" name="arquivo"
+                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+              <span class="file-cta">
+                <span class="file-icon">
+                  <ion-icon name="cloud-upload-outline"></ion-icon>
+                </span>
+                <span class="file-label">
+                  Escolha um arquivo
+                </span>
+              </span>
+              <span class="file-name">
+                Nenhum arquivo selecionado
+              </span>
+            </label>
+          </div>
+
+          <script>
+            const fileInput = document.querySelector('#file-js-example input[type=file]');
+            fileInput.onchange = () => {
+              if (fileInput.files.length > 0) {
+                const fileName = document.querySelector('#file-js-example .file-name');
+                fileName.textContent = fileInput.files[0].name;
+              }
+            }
+          </script>
         </div>
         <div class="field">
           <div class="field-body">

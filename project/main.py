@@ -237,19 +237,19 @@ def upload_create():
 @main.route('/status-training')
 @login_required
 def status_training():
-    total_transactions = Transactions.query.filter_by(
+    total_training = Training_status.query.filter_by(
         user_id=current_user.id).count()
 
-    if total_transactions == 0:
-        message = 'Sem registros.'
-        return render_template('dashboard/view-data.html', name=current_user.name, message=message)
+    if total_training == 0:
+        message = 'Sem treinamentos.'
+        return render_template('dashboard/view-training.html', name=current_user.name, message=message)
     else:
         page = request.args.get(get_page_parameter(), type=int, default=1)
         per_page = 30
 
-        pagination = Transactions.query.order_by(Transactions.created_at.desc()).paginate(
+        pagination = Training_status.query.order_by(Training_status.start.desc()).paginate(
             page=page, per_page=per_page)
-        transactions = pagination.items
+        trainings = pagination.items
         pagination_range = pagination.iter_pages(
             left_edge=2,
             left_current=2,
@@ -257,7 +257,7 @@ def status_training():
             right_edge=2
         )
 
-        return render_template('dashboard/view-training.html', name=current_user.name, transactions=transactions, pagination=pagination, pagination_range=pagination_range, total_transactions=total_transactions)
+        return render_template('dashboard/view-training.html', name=current_user.name, trainings=trainings, pagination=pagination, pagination_range=pagination_range, total_training=total_training)
 
 
 @main.route('/view-data')
