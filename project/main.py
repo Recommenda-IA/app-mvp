@@ -237,8 +237,10 @@ def upload_create():
 @main.route('/view-data')
 @login_required
 def view_data():
+    total_transactions = Transactions.query.filter_by(
+        user_id=current_user.id).count()
 
-    if Transactions.query.filter_by(user_id=current_user.id).count() == 0:
+    if total_transactions == 0:
         message = 'Sem registros.'
         return render_template('dashboard/view-data.html', name=current_user.name, message=message)
     else:
@@ -255,7 +257,7 @@ def view_data():
             right_edge=2
         )
 
-        return render_template('dashboard/view-data.html', name=current_user.name, transactions=transactions, pagination=pagination, pagination_range=pagination_range)
+        return render_template('dashboard/view-data.html', name=current_user.name, transactions=transactions, pagination=pagination, pagination_range=pagination_range, total_transactions=total_transactions)
 
 
 @main.route('/data-management')
