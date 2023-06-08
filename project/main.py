@@ -184,6 +184,7 @@ def upload_create():
         dados = [linha.split(',') for linha in linhas[1:]]
     elif arquivo.filename.endswith('.xlsx') or arquivo.filename.endswith('.xls'):
         # Processar arquivo Excel
+        # Requer a biblioteca pandas e openpyxl
         import pandas as pd
         try:
             df = pd.read_excel(arquivo)
@@ -208,17 +209,31 @@ def upload_create():
             flash('Dados incorretos. Verifique se os dados do arquivo seguem o padrão necessário ou se existem vírgulas entre os valores do arquivo.', 'error')
             return redirect(url_for('main.upload'))
 
-        id_transaction, id_item, name_item, customer_id, data_transaction = linha
-        transaction = Transactions(
-            id_transaction=id_transaction,
-            id_item=id_item,
-            name_item=name_item,
-            customer_id=customer_id,
-            data_transaction=data_transaction,
-            user_id=current_user.id
-        )
+    batch_size = 1000  # Tamanho do lote
+    total_records = len(dados)
+    # Calcula o número de lotes
+    num_batches = (total_records + batch_size - 1) // batch_size
+
+    for batch_index in range(num_batches):
+        start_index = batch_index * batch_size
+        end_index = min((batch_index + 1) * batch_size, total_records)
+        batch_data = dados[start_index:end_index]
+
+        transactions = []
+        for linha in batch_data:
+            id_transaction, id_item, name_item, customer_id, data_transaction = linha
+            transaction = Transactions(
+                id_transaction=id_transaction,
+                id_item=id_item,
+                name_item=name_item,
+                customer_id=customer_id,
+                data_transaction=data_transaction,
+                user_id=current_user.id
+            )
+            transactions.append(transaction)
+
         try:
-            db.session.add(transaction)
+            db.session.add_all(transactions)
             db.session.commit()
         except exc.SQLAlchemyError as error_query:
             flash(str(error_query.orig.args) + " for parameters " +
