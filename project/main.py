@@ -376,7 +376,7 @@ collection.create_indexes([
 def save_association_rules(user_id, start_date, end_date):
     # Armazenar informações de status de treinamento
     status_data = {
-        'start': datetime.datetime.now(),
+        'start': datetime.now(),
         'end': None,
         'status': None,
         'message': None
@@ -454,12 +454,12 @@ def save_association_rules(user_id, start_date, end_date):
                 json.dump(unsaved_records, file)
 
         # Atualizar informações de status
-        status_data['end'] = datetime.datetime.now()
+        status_data['end'] = datetime.now()
         status_data['status'] = 'success'
 
     except Exception as e:
         # Atualizar informações de status em caso de erro
-        status_data['end'] = datetime.datetime.now()
+        status_data['end'] = datetime.now()
         status_data['status'] = 'error'
         status_data['message'] = str(e)
 
