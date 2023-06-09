@@ -3,6 +3,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 import os
+from pymongo import MongoClient
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -20,9 +21,11 @@ def create_app():
 
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
     app.config['SECRET_KEY'] = os.environ['F_SECRET_KEY']
+    app.config['MONGO_URI'] = os.environ['MONGODBURL']
 
     db.init_app(app)
     migrate.init_app(app, db)
+    mongo = MongoClient(app.config['MONGO_URI'])
 
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'

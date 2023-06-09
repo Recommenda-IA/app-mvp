@@ -1,5 +1,6 @@
-from pymongo import MongoClient, ASCENDING
+from pymongo import MongoClient, ASCENDING, DESCENDING
 from pymongo.operations import IndexModel
+from ..models.mongo_model import Mongo
 from datetime import datetime
 import pandas as pd
 from mlxtend.frequent_patterns import fpgrowth
@@ -39,18 +40,10 @@ def remove_redundant_rules(rules):
 
 def create_association_rules(user_id, transactions_df):
     # Configuração do MongoDB
-    client = MongoClient(os.environ['MONGODBURL'])
-    db_mongo = client['associations']
-    collection = db_mongo['associations_data']
+    mongo = Mongo('associations', 'associations_data')
+
     # Configurar o índice para a coleção
-    collection.create_indexes([
-        IndexModel([('user_id', ASCENDING)]),
-        IndexModel([('antecedents', ASCENDING)]),
-        IndexModel([('support', ASCENDING)]),
-        IndexModel([('confidence', ASCENDING)]),
-        IndexModel([('lift', ASCENDING)]),
-        IndexModel([('consequent', ASCENDING)])
-    ])
+    mongo.create_indexes()
 
     # Armazenar informações de status de treinamento
     status_data = {
@@ -106,7 +99,7 @@ def create_association_rules(user_id, transactions_df):
             # Inserir registros acumulados quando atingir 1000
             if len(record_buffer) == 10000:
                 try:
-                    collection.insert_many(record_buffer)
+                    mongo.collection.insert_many(record_buffer)
                 except Exception as e:
                     unsaved_records.extend(record_buffer)
 
@@ -115,7 +108,7 @@ def create_association_rules(user_id, transactions_df):
         # Inserir registros remanescentes
         if record_buffer:
             try:
-                collection.insert_many(record_buffer)
+                mongo.collection.insert_many(record_buffer)
             except Exception as e:
                 unsaved_records.extend(record_buffer)
 

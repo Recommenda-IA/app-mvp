@@ -9,7 +9,7 @@ from datetime import datetime
 import pandas as pd
 from .helpers.freq_rules import create_association_rules
 from .models.models import Database_access, Training_frequency, Transactions, User_api, Training_status, Items
-from .models.mongo_model import get_association_rules, get_association_rules_by_antecedent
+from .models.mongo_model import Mongo
 from . import db
 
 main = Blueprint('main', __name__)
@@ -45,7 +45,6 @@ def profile():
 @main.route('/database')
 @login_required
 def database():
-    error = ''
     error_db_user = ''
     data_database = Database_access.query.filter_by(
         user_id=current_user.id).first()
@@ -72,7 +71,7 @@ def database():
             error_db_user = str(query_error.orig.args) + \
                 " for parameters " + str(query_error.params)
 
-    return render_template('dashboard/database.html', name=current_user.name, data_database=data_database, error=error, error_db_user=error_db_user, database_user_conected=database_user_conected)
+    return render_template('dashboard/database.html', name=current_user.name, data_database=data_database, error_db_user=error_db_user, database_user_conected=database_user_conected)
 
 
 @main.route('/database/<action>', methods=['POST'])
@@ -486,11 +485,12 @@ def get_association_rules_route():
         order = data.get('order')
         limit = data.get('limit')
 
-        rules = get_association_rules(user_id, metric, order, limit)
+        mongo = Mongo('associations', 'associations_data')
+        rules = mongo.get_association_rules(user_id, metric, order, limit)
 
         return rules
 
-    return 'Unauthorized', 401
+    return jsonify({'status': 401, 'message': 'Unauthorized'}), 401
 
 
 @main.route('/v1/associations/', methods=['POST'])
@@ -507,8 +507,9 @@ def get_association_rules_by_antecedent_route():
         limit = data.get('limit')
         antecedent = data.get('antecedent')
 
-        rules = get_association_rules_by_antecedent(
+        mongo = Mongo('associations', 'associations_data')
+        rules = mongo.get_association_rules_by_antecedent(
             user_id, antecedent, metric, order, limit)
         return rules
 
-    return 'Unauthorized', 401
+    return jsonify({'status': 401, 'message': 'Unauthorized'}), 401
