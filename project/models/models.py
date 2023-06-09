@@ -25,6 +25,8 @@ class User(UserMixin, db.Model):
     User_api = db.relationship('User_api', backref='user', lazy=True)
     Training_status = db.relationship(
         'Training_status', backref='user', lazy=True)
+    Items = db.relationship(
+        'Items', backref='user', lazy=True)
 
     def __init__(self, email, password, name):
         self.email = email
@@ -63,7 +65,7 @@ class Training_frequency(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     tr_activated = db.Column(db.Integer, default=0, nullable=False)
-    tr_frequency = db.Column(db.Enum('daily', 'weekly', 'fortnightly', 'monthly', name='train_frequency'),
+    tr_frequency = db.Column(db.Enum('daily', 'weekly', 'fortnightly', 'monthly', name='train_freq'),
                              default='monthly', nullable=False)
     created_at = db.Column(db.DateTime, default=datetime_ist, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime_ist,
@@ -96,6 +98,25 @@ class Transactions(db.Model):
         self.user_id = user_id
         self.name_item = name_item
         self.data_transaction = data_transaction
+
+
+class Items(db.Model):
+    __tablename__ = 'items'
+
+    id = db.Column(db.Integer, primary_key=True)
+    id_item = db.Column(db.Integer, nullable=False)
+    customer_id = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    name_item = db.Column(db.String(150), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime_ist, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime_ist,
+                           onupdate=datetime_ist, nullable=False)
+
+    def __init__(self, id_item, customer_id, user_id, name_item):
+        self.id_item = id_item
+        self.customer_id = customer_id
+        self.user_id = user_id
+        self.name_item = name_item
 
 
 class User_api(db.Model):

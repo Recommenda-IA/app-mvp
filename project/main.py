@@ -8,7 +8,7 @@ from hashlib import md5
 from datetime import datetime
 import pandas as pd
 from .helpers.freq_rules import create_association_rules
-from .models.models import Database_access, Training_frequency, Transactions, User_api, Training_status
+from .models.models import Database_access, Training_frequency, Transactions, User_api, Training_status, Items
 from .models.mongo_model import get_association_rules, get_association_rules_by_antecedent
 from . import db
 
@@ -184,8 +184,6 @@ def upload_create():
         dados = [linha.split(',') for linha in linhas[1:]]
     elif arquivo.filename.endswith('.xlsx') or arquivo.filename.endswith('.xls'):
         # Processar arquivo Excel
-        # Requer a biblioteca pandas e openpyxl
-        import pandas as pd
         try:
             df = pd.read_excel(arquivo)
             rotulos = df.columns.tolist()
@@ -197,6 +195,7 @@ def upload_create():
         flash('Formato de arquivo inválido. O arquivo deve ser CSV ou Excel.', 'error')
         return redirect(url_for('main.upload'))
 
+    # Verifica se existem os labels requeridos
     required_labels = ['id_transaction', 'id_item',
                        'name_item', 'customer_id', 'data_transaction']
     for label in required_labels:
@@ -204,10 +203,24 @@ def upload_create():
             flash('Sem rótulo ' + label, 'error')
             return redirect(url_for('main.upload'))
 
+    item_data = {}  # Dicionário para armazenar os dados dos itens distintos
+
     for linha in dados:
+        # Verifica se as linhas contem mais do que os itens requeridos
         if len(linha) != 5:
             flash('Dados incorretos. Verifique se os dados do arquivo seguem o padrão necessário ou se existem vírgulas entre os valores do arquivo.', 'error')
             return redirect(url_for('main.upload'))
+
+        id_transaction, id_item, name_item, customer_id, data_transaction = linha
+
+        # Adicionar os dados dos itens distintos ao dicionário
+        if id_item not in item_data:
+            item_data[id_item] = {
+                'id_item': id_item,
+                'customer_id': customer_id,
+                'user_id': current_user.id,
+                'name_item': name_item
+            }
 
     batch_size = 1000  # Tamanho do lote
     total_records = len(dados)
@@ -222,6 +235,8 @@ def upload_create():
         transactions = []
         for linha in batch_data:
             id_transaction, id_item, name_item, customer_id, data_transaction = linha
+
+            # Utilizar os dados do dicionário para criar os objetos Transactions
             transaction = Transactions(
                 id_transaction=id_transaction,
                 id_item=id_item,
@@ -239,7 +254,16 @@ def upload_create():
             flash(str(error_query.orig.args) + " for parameters " +
                   str(error_query.params), 'error')
 
-    flash('Dados salvos com sucesso!', 'success')
+    # Salvar os dados dos itens distintos na tabela "Items"
+    item_objects = [Items(**data) for data in item_data.values()]
+    try:
+        db.session.add_all(item_objects)
+        db.session.commit()
+    except exc.SQLAlchemyError as error_query:
+        flash(str(error_query.orig.args) + " for parameters " +
+              str(error_query.params), 'error')
+
+    flash('Dados importados com sucesso!', 'success')
     return redirect(url_for('main.upload'))
 
 
@@ -311,6 +335,10 @@ def data_management_delete():
         db_delete = request.form.get('db_delete')
         if db_delete == 'deletar transações':
             Transactions.query.filter_by(
+                user_id=current_user.id).delete()
+            db.session.commit()
+
+            Items.query.filter_by(
                 user_id=current_user.id).delete()
             db.session.commit()
 
