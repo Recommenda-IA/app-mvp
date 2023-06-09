@@ -493,18 +493,22 @@ def get_association_rules_route():
     return 'Unauthorized', 401
 
 
-@main.route('/association-rules/<int:user_id>/<antecedent>', methods=['GET'])
-def get_association_rules_by_antecedent_route(user_id, antecedent):
+@main.route('/v1/associations/', methods=['POST'])
+def get_association_rules_by_antecedent_route():
     """Rota para consultar as regras de associação por antecedente de um user_id"""
     api_key = request.headers.get('apiKey')
 
-    if verify_api_key(api_key, user_id):
-        metric = request.args.get('metric')
-        order = request.args.get('order')
-        limit = request.args.get('limit')
+    user_id = verify_api_key(api_key)
+
+    if user_id:
+        data = request.json
+        metric = data.get('metric')
+        order = data.get('order')
+        limit = data.get('limit')
+        antecedent = data.get('antecedent')
 
         rules = get_association_rules_by_antecedent(
             user_id, antecedent, metric, order, limit)
-        return jsonify(rules)
+        return rules
 
     return 'Unauthorized', 401
