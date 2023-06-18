@@ -303,7 +303,7 @@ def view_data():
         return render_template('dashboard/view-data.html', name=current_user.name, message=message)
     else:
         page = request.args.get(get_page_parameter(), type=int, default=1)
-        per_page = 30
+        per_page = 200
 
         pagination = Transactions.query.order_by(Transactions.created_at.desc()).paginate(
             page=page, per_page=per_page)
