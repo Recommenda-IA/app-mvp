@@ -2,6 +2,7 @@ from pymongo import MongoClient, ASCENDING, DESCENDING
 from pymongo.operations import IndexModel
 from ..models.mongo_model import Mongo
 from datetime import datetime
+import pytz
 import pandas as pd
 from mlxtend.frequent_patterns import fpgrowth
 from mlxtend.frequent_patterns import association_rules
@@ -39,6 +40,7 @@ def remove_redundant_rules(rules):
 
 
 def create_association_rules(user_id, transactions_df):
+
     # Configuração do MongoDB
     mongo = Mongo('associations', 'associations_data')
 
@@ -121,12 +123,15 @@ def create_association_rules(user_id, transactions_df):
                 json.dump(unsaved_records, file)
 
         # Atualizar informações de status
-        status_data['end'] = datetime.now()
+        ASP = pytz.timezone('america/sao_paulo')
+        datetime_ist = datetime.now(ASP)
+
+        status_data['end'] = datetime_ist
         status_data['status'] = 'success'
 
     except Exception as e:
         # Atualizar informações de status em caso de erro
-        status_data['end'] = datetime.now()
+        status_data['end'] = datetime_ist
         status_data['status'] = 'error'
         status_data['message'] = str(e)
 

@@ -6,8 +6,10 @@ from flask_login import login_required, current_user
 from sqlalchemy import exc, create_engine
 from hashlib import md5
 from datetime import datetime
+import pytz
 import pandas as pd
 from .helpers.freq_rules import create_association_rules
+from .helpers.helper import convert_to_sao_paulo_time
 from .models.models import Database_access, Training_frequency, Transactions, User_api, Training_status, Items
 from .models.mongo_model import Mongo
 from . import db
@@ -218,7 +220,8 @@ def upload_create():
                 'id_item': id_item,
                 'customer_id': customer_id,
                 'user_id': current_user.id,
-                'name_item': name_item
+                'name_item': name_item,
+                'created_at': datetime.now()
             }
 
     batch_size = 1000  # Tamanho do lote
@@ -242,7 +245,8 @@ def upload_create():
                 name_item=name_item,
                 customer_id=customer_id,
                 data_transaction=data_transaction,
-                user_id=current_user.id
+                user_id=current_user.id,
+                created_at=datetime.now()
             )
             transactions.append(transaction)
 
@@ -289,6 +293,13 @@ def status_training():
             right_edge=2
         )
 
+        # Converter o campo data_created de UTC para America/Sao_Paulo
+        for training in trainings:
+            training.start = convert_to_sao_paulo_time(
+                training.start)
+            training.end = convert_to_sao_paulo_time(
+                training.end)
+
         return render_template('dashboard/view-training.html', name=current_user.name, trainings=trainings, pagination=pagination, pagination_range=pagination_range, total_training=total_training)
 
 
@@ -314,6 +325,11 @@ def view_data():
             right_current=3,
             right_edge=2
         )
+
+        # Converter o campo data_created de UTC para America/Sao_Paulo
+        for transaction in transactions:
+            transaction.created_at = convert_to_sao_paulo_time(
+                transaction.created_at)
 
         return render_template('dashboard/view-data.html', name=current_user.name, transactions=transactions, pagination=pagination, pagination_range=pagination_range, total_transactions=total_transactions)
 
@@ -362,6 +378,12 @@ def api_users():
         return render_template('dashboard/api-users.html', name=current_user.name, message=message)
     else:
         data_users = User_api.query.filter_by(user_id=current_user.id)
+
+        # Converter o campo data_created de UTC para America/Sao_Paulo
+        for user in data_users:
+            user.created_at = convert_to_sao_paulo_time(
+                user.created_at)
+
         return render_template('dashboard/api-users.html', name=current_user.name, data_users=data_users)
 
 

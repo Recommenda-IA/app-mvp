@@ -5,7 +5,6 @@ from .. import db
 from datetime import datetime
 import pytz
 
-UTC = pytz.utc
 ASP = pytz.timezone('america/sao_paulo')
 datetime_ist = datetime.now(ASP)
 
@@ -91,13 +90,14 @@ class Transactions(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime_ist,
                            onupdate=datetime_ist, nullable=False)
 
-    def __init__(self, id_transaction, id_item, customer_id, user_id, name_item, data_transaction):
+    def __init__(self, id_transaction, id_item, customer_id, user_id, name_item, data_transaction, created_at):
         self.id_transaction = id_transaction
         self.id_item = id_item
         self.customer_id = customer_id
         self.user_id = user_id
         self.name_item = name_item
         self.data_transaction = data_transaction
+        self.created_at = created_at
 
 
 class Items(db.Model):
@@ -112,11 +112,12 @@ class Items(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime_ist,
                            onupdate=datetime_ist, nullable=False)
 
-    def __init__(self, id_item, customer_id, user_id, name_item):
+    def __init__(self, id_item, customer_id, user_id, name_item, created_at):
         self.id_item = id_item
         self.customer_id = customer_id
         self.user_id = user_id
         self.name_item = name_item
+        self.created_at = created_at
 
 
 class User_api(db.Model):
