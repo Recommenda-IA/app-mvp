@@ -24,7 +24,7 @@ def index():
 
 @main.route('/price')
 def price():
-    return render_template('pages/index.html')
+    return render_template('pages/price.html')
 
 
 @main.route('/products')
