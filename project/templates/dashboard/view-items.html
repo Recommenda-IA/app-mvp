@@ -1,4 +1,4 @@
-<!-- templates/view-data.html -->
+<!-- templates/view-items.html -->
 
 {% extends "parts/base-intern.html" %}
 
@@ -12,38 +12,34 @@
     {% include 'parts/alerts.html' %}
     <div class="box">
       <div class="field">
-        <h2 class="subtitle">Visualizar dados salvos {% if total_transactions %} - {{ total_transactions }} transações{%
+        <h2 class="subtitle">Visualizar itens salvos {% if total_items %} - {{ total_items }} items{%
           endif %}</h2>
       </div>
       <div class="field">
-        {% if transactions %}
+        {% if items %}
         <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
           <thead>
             <tr>
-              <th>Id de transação</th>
               <th>Id do item</th>
               <th>Nome</th>
               <th>Id do cliente</th>
-              <th>Data da transação</th>
               <th>Data de importação</th>
             </tr>
           </thead>
           <tbody>
-            {% for transaction in transactions %}
+            {% for item in items %}
             <tr>
-              <td>{{ transaction.id_transaction }}</td>
-              <td>{{ transaction.id_item }}</td>
-              <td>{{ transaction.name_item }}</td>
-              <td>{{ transaction.customer_id }}</td>
-              <td>{{ transaction.data_transaction.strftime('%d/%m/%Y %H:%M:%S') }}</td>
-              <td>{{ transaction.created_at.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+              <td>{{ item.id_item }}</td>
+              <td>{{ item.name_item }}</td>
+              <td>{{ item.customer_id }}</td>
+              <td>{{ item.created_at.strftime('%d/%m/%Y %H:%M:%S') }}</td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
         <div class="pagination">
           {% if pagination.has_prev %}
-          <a href="{{ url_for('main.view_data', page=pagination.prev_num) }}">Anterior</a>
+          <a href="{{ url_for('main.view_items', page=pagination.prev_num) }}">Anterior</a>
           {% else %}
           <span class="disabled">Anterior</span>
           {% endif %}
@@ -53,7 +49,7 @@
           {% if pagination.page == page %}
           <span class="current-page">{{ page }}</span>
           {% else %}
-          <a href="{{ url_for('main.view_data', page=page) }}">{{ page }}</a>
+          <a href="{{ url_for('main.view_items', page=page) }}">{{ page }}</a>
           {% endif %}
           {% else %}
           <span class="ellipsis">...</span>
@@ -61,7 +57,7 @@
           {% endfor %}
 
           {% if pagination.has_next %}
-          <a href="{{ url_for('main.view_data', page=pagination.next_num) }}">Próximo</a>
+          <a href="{{ url_for('main.view_items', page=pagination.next_num) }}">Próximo</a>
           {% else %}
           <span class="disabled">Próximo</span>
           {% endif %}

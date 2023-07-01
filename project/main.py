@@ -300,15 +300,15 @@ def status_training():
         return render_template('dashboard/view-training.html', name=current_user.name, trainings=trainings, pagination=pagination, pagination_range=pagination_range, total_training=total_training)
 
 
-@main.route('/view-data')
+@main.route('/view-transactions')
 @login_required
-def view_data():
+def view_transactions():
     total_transactions = Transactions.query.filter_by(
         user_id=current_user.id).count()
 
     if total_transactions == 0:
         message = 'Sem registros.'
-        return render_template('dashboard/view-data.html', name=current_user.name, message=message)
+        return render_template('dashboard/view-transactions.html', name=current_user.name, message=message)
     else:
         page = request.args.get(get_page_parameter(), type=int, default=1)
         per_page = 200
@@ -327,7 +327,37 @@ def view_data():
         for transaction in transactions:
             transaction.created_at = transaction.created_at
 
-        return render_template('dashboard/view-data.html', name=current_user.name, transactions=transactions, pagination=pagination, pagination_range=pagination_range, total_transactions=total_transactions)
+        return render_template('dashboard/view-transactions.html', name=current_user.name, transactions=transactions, pagination=pagination, pagination_range=pagination_range, total_transactions=total_transactions)
+
+
+@main.route('/view-items')
+@login_required
+def view_items():
+    total_items = Items.query.filter_by(
+        user_id=current_user.id).count()
+
+    if total_items == 0:
+        message = 'Sem registros.'
+        return render_template('dashboard/view-items.html', name=current_user.name, message=message)
+    else:
+        page = request.args.get(get_page_parameter(), type=int, default=1)
+        per_page = 200
+
+        pagination = Items.query.order_by(Items.created_at.desc()).paginate(
+            page=page, per_page=per_page)
+        items = pagination.items
+        pagination_range = pagination.iter_pages(
+            left_edge=2,
+            left_current=2,
+            right_current=3,
+            right_edge=2
+        )
+
+        # Converter o campo data_created de UTC para America/Sao_Paulo
+        for item in items:
+            item.created_at = item.created_at
+
+        return render_template('dashboard/view-items.html', name=current_user.name, items=items, pagination=pagination, pagination_range=pagination_range, total_items=total_items)
 
 
 @main.route('/data-management')
@@ -335,8 +365,10 @@ def view_data():
 def data_management():
     total_transactions = Transactions.query.filter_by(
         user_id=current_user.id).count()
+    total_items = Items.query.filter_by(
+        user_id=current_user.id).count()
 
-    return render_template('dashboard/data-management.html', name=current_user.name, total_transactions=total_transactions)
+    return render_template('dashboard/data-management.html', name=current_user.name, total_transactions=total_transactions, total_items=total_items)
 
 
 @main.route('/data-management/delete', methods=['POST'])
@@ -344,7 +376,7 @@ def data_management():
 def data_management_delete():
     try:
         db_delete = request.form.get('db_delete')
-        if db_delete == 'deletar transações':
+        if db_delete == 'deletar dados':
             Transactions.query.filter_by(
                 user_id=current_user.id).delete()
             db.session.commit()
