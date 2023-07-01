@@ -38,7 +38,7 @@
         <p>Recomendável cadastrar um usuário com permissão de somente leitura.</p>
       </div>
       {% if data_database.db_user %}
-      <form method="POST" action="/database/delete">
+      <form method="POST" action="/database/update">
         {% else %}
         <form method="POST" action="/database/create">
           {% endif %}
@@ -47,7 +47,7 @@
               <div class="field">
                 <p class="control is-expanded has-icons-left">
                   <input class="input" type="text" name="db_user" placeholder="Usuário do banco de dados"
-                    value="{{ data_database.db_user }}">
+                    value="{{ data_database.db_user }}" required>
                   <span class="icon is-small is-left">
                     <ion-icon name="person-outline"></ion-icon>
                   </span>
@@ -56,7 +56,7 @@
               <div class="field">
                 <p class="control is-expanded has-icons-left">
                   <input class="input" type="password" name="db_password" placeholder="Senha do banco de dados"
-                    value="{{ data_database.db_password }}">
+                    value="{{ data_database.db_password }}" required>
                   <span class="icon is-small is-left">
                     <ion-icon name="lock-closed-outline"></ion-icon>
                   </span>
@@ -69,7 +69,7 @@
               <div class="field">
                 <p class="control is-expanded has-icons-left">
                   <input class="input" type="text" name="db_host" placeholder="Servidor do banco de dados"
-                    value="{{ data_database.db_host }}">
+                    value="{{ data_database.db_host }}" required>
                   <span class="icon is-small is-left">
                     <ion-icon name="globe-outline"></ion-icon>
                   </span>
@@ -78,9 +78,22 @@
               <div class="field">
                 <p class="control is-expanded has-icons-left">
                   <input class="input" type="text" name="db_name" placeholder="Nome do banco de dados"
-                    value="{{ data_database.db_name }}">
+                    value="{{ data_database.db_name }}" required>
                   <span class="icon is-small is-left">
                     <ion-icon name="server-outline"></ion-icon>
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal">
+            <div class="field-body">
+              <div class="field">
+                <p class="control is-expanded has-icons-left">
+                  <input class="input" type="text" name="db_port" placeholder="Porta"
+                    value="{{ data_database.db_port }}" style="width: 150px;" required>
+                  <span class="icon is-small is-left">
+                    <ion-icon name="tablet-portrait-outline"></ion-icon>
                   </span>
                 </p>
               </div>
@@ -114,7 +127,7 @@
               <div class="field">
                 <p class="control is-expanded has-icons-left">
                   <input class="input" type="text" name="db_view" placeholder="Nome da view de consulta"
-                    value="{{ data_database.db_view }}">
+                    value="{{ data_database.db_view }}" required>
                   <span class="icon is-small is-left">
                     <ion-icon name="eye-outline"></ion-icon>
                   </span>
@@ -122,16 +135,12 @@
               </div>
             </div>
           </div>
-          <div class="field">
+          <div class="field mb-3">
             <div class="field-body">
               {% if data_database.db_user %}
-              <div class="notification p-2 is-danger is-light">
-                <p class="mb-2"><small>Para deletar as informações, digite <i>deletar banco de dados</i></small></p>
-                <input class="input is-small is-2 mb-2" type="text" name="db_delete">
-                <button class="button is-danger" type="submit">
-                  Excluir
-                </button>
-              </div>
+              <button class="button is-info" type="submit">
+                Atualizar
+              </button>
               {% else %}
               <button class="button is-info" type="submit">
                 Salvar
@@ -140,9 +149,21 @@
             </div>
           </div>
         </form>
+        <form method="POST" action="/database/delete">
+          <div class="field-body">
+            {% if data_database.db_user %}
+            <div class="notification p-2 is-danger is-light">
+              <p class="mb-2"><small>Para deletar as informações, digite <i>deletar banco de dados</i></small></p>
+              <input class="input is-small is-2 mb-2" type="text" name="db_delete">
+              <button class="button is-danger" type="submit">
+                Excluir
+              </button>
+            </div>
+            {% endif %}
+          </div>
+        </form>
     </div>
   </div>
-</div>
 </div>
 
 <div class="modal" id="view-example-modal">

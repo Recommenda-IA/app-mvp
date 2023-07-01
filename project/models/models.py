@@ -43,18 +43,20 @@ class Database_access(db.Model):
     db_password = db.Column(db.String(100), nullable=False)
     db_name = db.Column(db.String(1000), nullable=False)
     db_host = db.Column(db.String(100), nullable=False)
+    db_port = db.Column(db.Integer, nullable=False)
     db_view = db.Column(db.String(100), nullable=False)
     db_sgbd = db.Column(db.String(10), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime_ist, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime_ist,
                            onupdate=datetime_ist, nullable=False)
 
-    def __init__(self, user_id, db_user, db_password, db_name, db_host, db_view, db_sgbd):
+    def __init__(self, user_id, db_user, db_password, db_name, db_host, db_port, db_view, db_sgbd):
         self.user_id = user_id
         self.db_user = db_user
         self.db_password = db_password
         self.db_name = db_name
         self.db_host = db_host
+        self.db_port = db_port
         self.db_view = db_view
         self.db_sgbd = db_sgbd
 

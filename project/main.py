@@ -3,7 +3,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 from flask_paginate import Pagination, get_page_parameter
 from flask_login import login_required, current_user
-from sqlalchemy import exc, create_engine
+from sqlalchemy import exc, create_engine, inspect
 from hashlib import md5
 from datetime import datetime
 import pytz
@@ -55,19 +55,41 @@ def database():
         usuario_db = data_database.db_user
         senha_db = data_database.db_password
         host_db = data_database.db_host
+        port_db = data_database.db_port
         database = data_database.db_name
+        view_db = data_database.db_view
 
         if data_database.db_sgbd == 'mysql':
             engine = create_engine(
-                f"mysql+mysqlconnector://{usuario_db}:{senha_db}@{host_db}/{database}", connect_args={'connect_timeout': 5})
+                f"mysql+mysqlconnector://{usuario_db}:{senha_db}@{host_db}:{port_db}/{database}", connect_args={'connect_timeout': 5})
 
         if data_database.db_sgbd == 'postgresql':
             engine = create_engine(
-                f"postgresql+psycopg2://{usuario_db}:{senha_db}@{host_db}/{database}", connect_args={'connect_timeout': 5})
+                f"postgresql+psycopg2://{usuario_db}:{senha_db}@{host_db}:{port_db}/{database}", connect_args={'connect_timeout': 5})
 
         try:
             conn = engine.connect()
             database_user_conected = True
+
+            inspector = inspect(engine)
+            view_name = view_db
+            required_columns = ['id_transaction', 'id_item',
+                                'name_item', 'customer_id', 'data_transaction']
+
+            if view_name in inspector.get_view_names():
+                view_columns = [column['name']
+                                for column in inspector.get_columns(view_name)]
+
+                if not all(column in view_columns for column in required_columns):
+                    # Algumas colunas estão faltando na view "transacoes"
+                    missing_columns = set(required_columns) - set(view_columns)
+                    error_message = f"As seguintes colunas obrigatórias estão faltando na view '{view_name}': {', '.join(missing_columns)}"
+                    flash(error_message, 'error')
+            else:
+                # A view "transacoes" não existe
+                error_message = f"A view '{view_name}' não existe no banco de dados cadastrado."
+                flash(error_message, 'error')
+
         except exc.SQLAlchemyError as query_error:
             error_db_user = str(query_error.orig.args) + \
                 " for parameters " + str(query_error.params)
@@ -87,13 +109,53 @@ def database_action(action):
             db_name = request.form.get('db_name')
             db_sgbd = request.form.get('db_sgbd')
             db_view = request.form.get('db_view')
+            db_port = request.form.get('db_port')
+
+            if db_user == '' or db_password == '' or db_host == '' or db_name == '' or db_sgbd == '' or db_view == '' or db_port == '':
+                flash('Todas as informações são obrigatórias.', 'error')
+                return redirect(url_for('main.database'))
 
             new_database = Database_access(db_user=db_user, user_id=current_user.id, db_host=db_host,
-                                           db_password=db_password, db_name=db_name, db_view=db_view, db_sgbd=db_sgbd)
+                                           db_password=db_password, db_name=db_name, db_view=db_view, db_sgbd=db_sgbd, db_port=db_port)
             db.session.add(new_database)
             db.session.commit()
 
             flash('Banco de dados cadastrado com sucesso.', 'success')
+
+        except exc.SQLAlchemyError as error_query:
+            flash(str(error_query.orig.args) + " for parameters " +
+                  str(error_query.params), 'error')
+
+    if action == 'update':
+        try:
+            db_user = request.form.get('db_user')
+            db_password = request.form.get('db_password')
+            db_host = request.form.get('db_host')
+            db_name = request.form.get('db_name')
+            db_sgbd = request.form.get('db_sgbd')
+            db_view = request.form.get('db_view')
+            db_port = request.form.get('db_port')
+
+            if db_user == '' or db_password == '' or db_host == '' or db_name == '' or db_sgbd == '' or db_view == '' or db_port == '':
+                flash('Todas as informações são obrigatórias.', 'error')
+                return redirect(url_for('main.database'))
+
+            new_database = Database_access(db_user=db_user, user_id=current_user.id, db_host=db_host,
+                                           db_password=db_password, db_name=db_name, db_view=db_view, db_sgbd=db_sgbd, db_port=db_port)
+            database = Database_access.query.filter_by(
+                user_id=current_user.id).first()
+
+            database.db_user = db_user
+            database.db_password = db_password
+            database.db_host = db_host
+            database.db_name = db_name
+            database.db_sgbd = db_sgbd
+            database.db_view = db_view
+            database.db_port = db_port
+
+            db.session.commit()
+
+            flash('Banco de dados atualizado com sucesso.', 'success')
 
         except exc.SQLAlchemyError as error_query:
             flash(str(error_query.orig.args) + " for parameters " +
