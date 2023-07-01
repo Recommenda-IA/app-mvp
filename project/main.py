@@ -457,26 +457,43 @@ def run_association_rules():
     db.session.commit()
     training_status_id = training_status.id
 
-    # Consulta no banco de dados filtrando pelo user_id e intervalo de data
-    transactions = Transactions.query.filter_by(user_id=user_id).filter(
-        Transactions.data_transaction.between(start_date, end_date)).all()
+    try:
 
-    # Criação do DataFrame a partir dos dados das transações
-    transactions_df = pd.DataFrame([(t.id_transaction, t.id_item)
-                                    for t in transactions], columns=['id_transaction', 'id_item'])
+        # Consulta no banco de dados filtrando pelo user_id e intervalo de data
+        transactions = Transactions.query.filter_by(user_id=user_id).filter(
+            Transactions.data_transaction.between(start_date, end_date)).all()
 
-    # Chamar a função create_association_rules
-    status_data = create_association_rules(
-        user_id, transactions_df)
+        # Criação do DataFrame a partir dos dados das transações
+        transactions_df = pd.DataFrame([(t.id_transaction, t.id_item)
+                                        for t in transactions], columns=['id_transaction', 'id_item'])
 
-    # Salvar as informações de status na tabela Training_status
-    Training_status.query.filter_by(id=training_status_id).update(status_data)
-    db.session.commit()
+        # Chamar a função create_association_rules
+        status_data = create_association_rules(
+            user_id, transactions_df)
 
-    print(f'Fim: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
-    print('-------')
+        # Salvar as informações de status na tabela Training_status
+        Training_status.query.filter_by(
+            id=training_status_id).update(status_data)
+        db.session.commit()
 
-    return 'Association rules saved successfully.'
+        print(f'Fim: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
+        print('-------')
+
+        return 'Association rules saved successfully.'
+
+    except Exception as e:
+        # Atualizar informações de status em caso de erro
+        status_data = {}
+        status_data['end'] = datetime.now()
+        status_data['status'] = 'error'
+        status_data['message'] = str(e)
+
+        # Salvar as informações de status na tabela Training_status
+        Training_status.query.filter_by(
+            id=training_status_id).update(status_data)
+        db.session.commit()
+
+        return 'Error'
 
 
 def verify_api_key(api_key):

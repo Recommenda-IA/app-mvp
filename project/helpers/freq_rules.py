@@ -123,8 +123,7 @@ def create_association_rules(user_id, transactions_df):
                 json.dump(unsaved_records, file)
 
         # Atualizar informações de status
-        ASP = pytz.timezone('america/sao_paulo')
-        datetime_ist = datetime.now(ASP)
+        datetime_ist = datetime.now()
 
         status_data['end'] = datetime_ist
         status_data['status'] = 'success'
