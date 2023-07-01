@@ -9,7 +9,6 @@ from datetime import datetime
 import pytz
 import pandas as pd
 from .helpers.freq_rules import create_association_rules
-from .helpers.helper import convert_to_sao_paulo_time
 from .models.models import Database_access, Training_frequency, Transactions, User_api, Training_status, Items
 from .models.mongo_model import Mongo
 from . import db
@@ -295,10 +294,8 @@ def status_training():
 
         # Converter o campo data_created de UTC para America/Sao_Paulo
         for training in trainings:
-            training.start = convert_to_sao_paulo_time(
-                training.start)
-            training.end = convert_to_sao_paulo_time(
-                training.end)
+            training.start = training.start
+            training.end = training.end
 
         return render_template('dashboard/view-training.html', name=current_user.name, trainings=trainings, pagination=pagination, pagination_range=pagination_range, total_training=total_training)
 
@@ -328,8 +325,7 @@ def view_data():
 
         # Converter o campo data_created de UTC para America/Sao_Paulo
         for transaction in transactions:
-            transaction.created_at = convert_to_sao_paulo_time(
-                transaction.created_at)
+            transaction.created_at = transaction.created_at
 
         return render_template('dashboard/view-data.html', name=current_user.name, transactions=transactions, pagination=pagination, pagination_range=pagination_range, total_transactions=total_transactions)
 
@@ -381,8 +377,7 @@ def api_users():
 
         # Converter o campo data_created de UTC para America/Sao_Paulo
         for user in data_users:
-            user.created_at = convert_to_sao_paulo_time(
-                user.created_at)
+            user.created_at = user.created_at
 
         return render_template('dashboard/api-users.html', name=current_user.name, data_users=data_users)
 

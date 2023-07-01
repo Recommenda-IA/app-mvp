@@ -5,8 +5,9 @@ from .. import db
 from datetime import datetime
 import pytz
 
-ASP = pytz.timezone('america/sao_paulo')
-datetime_ist = datetime.now(ASP)
+""" ASP = pytz.timezone('america/sao_paulo')
+datetime_ist = datetime.now(ASP) """
+datetime_ist = datetime.now()
 
 
 class User(UserMixin, db.Model):
