@@ -3,7 +3,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 from flask_paginate import Pagination, get_page_parameter
 from flask_login import login_required, current_user
-from sqlalchemy import exc, create_engine, inspect
+from sqlalchemy import exc, create_engine, inspect, text
 from hashlib import md5
 from datetime import datetime
 import pytz
@@ -50,6 +50,8 @@ def database():
     data_database = Database_access.query.filter_by(
         user_id=current_user.id).first()
     database_user_conected = False
+    transactions_from_database = ''
+    date_interval = ''
 
     if data_database:
         usuario_db = data_database.db_user
@@ -85,6 +87,14 @@ def database():
                     missing_columns = set(required_columns) - set(view_columns)
                     error_message = f"As seguintes colunas obrigatórias estão faltando na view '{view_name}': {', '.join(missing_columns)}"
                     flash(error_message, 'error')
+                else:
+                    query = text(
+                        f"SELECT * FROM {view_name} ORDER BY data_transaction DESC LIMIT 5;")
+                    transactions_from_database = conn.execute(query)
+
+                    query_date = text(
+                        f"SELECT MAX(data_transaction) as max_date,  MIN(data_transaction) as min_date FROM {view_name};")
+                    date_interval = conn.execute(query_date)
             else:
                 # A view "transacoes" não existe
                 error_message = f"A view '{view_name}' não existe no banco de dados cadastrado."
@@ -94,7 +104,7 @@ def database():
             error_db_user = str(query_error.orig.args) + \
                 " for parameters " + str(query_error.params)
 
-    return render_template('dashboard/database.html', name=current_user.name, data_database=data_database, error_db_user=error_db_user, database_user_conected=database_user_conected)
+    return render_template('dashboard/database.html', name=current_user.name, data_database=data_database, error_db_user=error_db_user, database_user_conected=database_user_conected, transactions_from_database=transactions_from_database, date_interval=date_interval)
 
 
 @main.route('/database/<action>', methods=['POST'])

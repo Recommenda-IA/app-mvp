@@ -13,7 +13,6 @@
     {% if data_database.db_user %}
     <div class="box">
       <h2 class="subtitle">Status do banco de dados</h2>
-      <br>
       {% if database_user_conected %}
       <div class="tags has-addons">
         <span class="tag">{{ data_database.db_name }}</span>
@@ -29,6 +28,48 @@
         Erro de conexão: {{ error_db_user }}
       </div>
       {% endif %}
+      {% endif %}
+
+      {% if transactions_from_database %}
+      <h2 class="subtitle">Visualização de dados</h2>
+      <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+        <thead>
+          <tr>
+            <th>Data mínima</th>
+            <th>Data máxima</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in date_interval %}
+          <tr>
+            <td>{{ item.min_date.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+            <td>{{ item.max_date.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+        <thead>
+          <tr>
+            <th>Id de transação</th>
+            <th>Id do item</th>
+            <th>Nome</th>
+            <th>Id do cliente</th>
+            <th>Data da transação</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in transactions_from_database %}
+          <tr>
+            <td>{{ item.id_transaction }}</td>
+            <td>{{ item.id_item }}</td>
+            <td>{{ item.name_item }}</td>
+            <td>{{ item.customer_id }}</td>
+            <td>{{ item.data_transaction.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
       {% endif %}
     </div>
     {% endif %}
