@@ -100,6 +100,8 @@ def database():
                 error_message = f"A view '{view_name}' não existe no banco de dados cadastrado."
                 flash(error_message, 'error')
 
+            engine.dispose()
+
         except exc.SQLAlchemyError as query_error:
             error_db_user = str(query_error.orig.args) + \
                 " for parameters " + str(query_error.params)
