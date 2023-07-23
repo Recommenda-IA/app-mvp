@@ -25,7 +25,6 @@ def create_app():
 
     db.init_app(app)
     migrate.init_app(app, db)
-    mongo = MongoClient(app.config['MONGO_URI'])
 
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
