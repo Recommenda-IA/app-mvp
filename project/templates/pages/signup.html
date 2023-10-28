@@ -18,7 +18,7 @@
             <form method="POST" action="/signup">
                 <div class="field">
                     <div class="control has-icons-left">
-                        <input class="input" type="email" name="email" placeholder="E-mail" autofocus="">
+                        <input class="input" type="email" name="email" placeholder="E-mail" autocomplete="off" required>
                         <span class="icon is-small is-left">
                             <ion-icon name="mail-outline"></ion-icon>
                         </span>
@@ -27,7 +27,7 @@
 
                 <div class="field">
                     <div class="control has-icons-left">
-                        <input class="input" type="text" name="name" placeholder="Nome" autofocus="">
+                        <input class="input" type="text" name="name" placeholder="Nome" autocomplete="off" required>
                         <span class="icon is-small is-left">
                             <ion-icon name="person-outline"></ion-icon>
                         </span>
@@ -36,7 +36,8 @@
 
                 <div class="field">
                     <div class="control has-icons-left">
-                        <input class="input" type="password" name="password" placeholder="Senha">
+                        <input class="input" type="password" name="password" placeholder="Senha" autocomplete="off"
+                            required>
                         <span class="icon is-small is-left">
                             <ion-icon name="lock-closed-outline"></ion-icon>
                         </span>
