@@ -18,17 +18,17 @@ main = Blueprint('main', __name__)
 
 @main.route('/')
 def index():
-    return render_template('pages/index.html')
+    return render_template('pages/login.html')
 
 
 @main.route('/price')
 def price():
-    return render_template('pages/price.html')
+    return render_template('pages/login.html')
 
 
 @main.route('/products')
 def products():
-    return render_template('pages/index.html')
+    return render_template('pages/login.html')
 
 
 @main.route('/dashboard')
@@ -544,19 +544,19 @@ def api_users_actions(action):
 @main.route('/association-rules', methods=['POST'])
 def run_association_rules():
 
-    inicio = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    start_training = datetime.now()
 
     user_id = 1
     start_date = '2000-06-30'
     end_date = '2010-07-02'
 
     print('-------')
-    print(f'Início: {inicio}')
+    print(f'Início: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
     print('-------')
 
     training_status = Training_status(
         user_id=user_id,
-        start=datetime.now(),
+        start=start_training,
         status='working'
     )
     db.session.add(training_status)
@@ -585,13 +585,20 @@ def run_association_rules():
         print(f'Fim: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
         print('-------')
 
-        return 'Association rules saved successfully.'
+        response = {
+            'start': start_training,
+            'end': datetime.now(),
+            'status': 200,
+            'message': 'Association rules saved successfully.'
+        }
+
+        return jsonify(response), 200
 
     except Exception as e:
         # Atualizar informações de status em caso de erro
         status_data = {}
         status_data['end'] = datetime.now()
-        status_data['status'] = 'error'
+        status_data['status'] = 500
         status_data['message'] = str(e)
 
         # Salvar as informações de status na tabela Training_status
@@ -599,7 +606,15 @@ def run_association_rules():
             id=training_status_id).update(status_data)
         db.session.commit()
 
-        return 'Error'
+        status_data['start'] = start_training
+
+        print(f'Erro: {str(e)}')
+
+        print('-------')
+        print(f'Fim: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
+        print('-------')
+
+        return jsonify(status_data), 500
 
 
 def verify_api_key(api_key):
