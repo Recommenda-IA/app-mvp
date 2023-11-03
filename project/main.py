@@ -487,6 +487,12 @@ def api_users():
 
         return render_template('dashboard/api-users.html', name=current_user.name, data_users=data_users)
 
+@main.route('/api-docs')
+@login_required
+def api_docs():
+
+    return render_template('dashboard/api-docs.html')
+
 
 @main.route('/api-users/<action>', methods=['POST'])
 @login_required
@@ -634,8 +640,21 @@ def get_association_rules_route():
 
     user_id = verify_api_key(api_key)
 
+    try:
+        data = request.get_json()
+    except ValueError:
+        return jsonify({'status': 400, 'message': 'The request body is not valid JSON.', 'end': datetime.now()}), 400
+
+    # Lista de campos obrigatórios
+    required_fields = ['metric', 'order', 'limit']
+    missing_fields = [field for field in required_fields if field not in data]
+
     if user_id:
-        data = request.json
+        if missing_fields:
+            missing_fields_str = ', '.join(missing_fields)
+            error_message = f"The following fields are missing: {missing_fields_str}"
+            return jsonify({'status': 400, 'message': error_message, 'end': datetime.now()}), 400
+
         metric = data.get('metric')
         order = data.get('order')
         limit = data.get('limit')
@@ -645,7 +664,7 @@ def get_association_rules_route():
 
         return rules
 
-    return jsonify({'status': 401, 'message': 'Unauthorized'}), 401
+    return jsonify({'status': 401, 'message': 'Unauthorized', 'end': datetime.now()}), 401
 
 
 @main.route('/v1/associations/', methods=['POST'])
@@ -655,8 +674,20 @@ def get_association_rules_by_antecedent_route():
 
     user_id = verify_api_key(api_key)
 
+    try:
+        data = request.get_json()
+    except ValueError:
+        return jsonify({'status': 400, 'message': 'The request body is not valid JSON.', 'end': datetime.now()}), 400
+
+    # Lista de campos obrigatórios
+    required_fields = ['metric', 'order', 'limit', 'antecedent']
+    missing_fields = [field for field in required_fields if field not in data]
+
     if user_id:
-        data = request.json
+        if missing_fields:
+            missing_fields_str = ', '.join(missing_fields)
+            error_message = f"The following fields are missing: {missing_fields_str}"
+            return jsonify({'status': 400, 'message': error_message, 'end': datetime.now()}), 400
         metric = data.get('metric')
         order = data.get('order')
         limit = data.get('limit')
@@ -667,4 +698,4 @@ def get_association_rules_by_antecedent_route():
             user_id, antecedent, metric, order, limit)
         return rules
 
-    return jsonify({'status': 401, 'message': 'Unauthorized'}), 401
+    return jsonify({'status': 401, 'message': 'Unauthorized', 'end': datetime.now()}), 401

@@ -1,0 +1,58 @@
+<!-- templates/api-docs.html -->
+
+{% extends "parts/base-intern.html" %}
+
+{% block content %}
+
+<div class="columns is-full">
+  <div class="column is-one-quarter">
+    {% include 'navigations/basket_analysis.html' %}
+  </div>
+  <div class="column">
+    {% include 'parts/alerts.html' %}
+    <div class="box">
+      <div class="field">
+        <h2 class="subtitle">Documentação de Api</h2>
+      </div>
+      <br>
+      <div class="field">
+        <h3 class="subtitle">Autenticação</h2>
+          <p class="mb-4">Para autenticar, envie a chave de api obtida em <a
+              href="{{ url_for('main.api_users') }}">Usuários</a> no header da requisição.</p>
+          <code>Apikey: sk-27...40</code>
+      </div>
+      <br>
+      <div class="field">
+        <h3 class="subtitle">Obter todas as associações</h2>
+          <p class="mb-4">(POST) https://app.recommenda.com.br/v1/association-rules</p>
+          <code>
+            {
+              "metric":"support, confidence or lift",
+              "order": "asc or desc",
+              "limit": 5
+            }
+          </code>
+      </div>
+      <br>
+      <div class="field">
+        <h3 class="subtitle">Obter associações para uma lista de produtos</h2>
+          <p class="mb-4">(POST) https://app.recommenda.com.br/v1/associations</p>
+          <code>
+            {
+              "metric":"support, confidence or lift",
+              "order": "asc or desc",
+              "limit": 5,
+              "antecedent" : [738, 762]
+            }
+          </code>
+          <p class="mt-4">Envie uma lista de ids dos produtos. Os ids enviados devem corresponder aos ids salvos no
+            Recommenda.
+            Consulte a lista de produtos salvos em <a href="{{ url_for('main.view_items') }}">Itens</a>.</p>
+      </div>
+      <br>
+    </div>
+  </div>
+</div>
+</div>
+
+{% endblock %}
