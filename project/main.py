@@ -9,15 +9,18 @@ from datetime import datetime
 import pytz
 import pandas as pd
 from .helpers.freq_rules import create_association_rules
-from .models.models import Database_access, Training_frequency, Transactions, User_api, Training_status, Items
+from .models.models import Database_access, Training_frequency, Transactions, User_api, Training_status, Items, User
 from .models.mongo_model import Mongo
 from . import db
+from werkzeug.security import generate_password_hash
 
 main = Blueprint('main', __name__)
 
 
 @main.route('/')
 def index():
+    if current_user.is_authenticated:
+        return render_template('dashboard/dashboard.html', name=current_user.name)
     return render_template('pages/login.html')
 
 
@@ -40,7 +43,48 @@ def dashboard():
 @main.route('/profile')
 @login_required
 def profile():
-    return render_template('dashboard/profile.html', name=current_user.name)
+    return render_template('dashboard/profile.html', user=current_user)
+
+@main.route('/profile/<action>', methods=['POST'])
+@login_required
+def profile_action(action):
+
+    if action == 'update':
+        try:
+            email = request.form.get('email')
+            password = request.form.get('password')
+            password2 = request.form.get('password2')
+            name = request.form.get('name')
+
+            if name == '' or email == '':
+                flash('Nome e e-mail são obrigatórios.', 'error')
+                return redirect(url_for('main.profile'))
+            
+            if password != '' and password2 != '':
+                if password != password2 != '':
+                    flash('As senhas não correspondem.', 'error')
+                    return redirect(url_for('main.profile'))
+
+            db_user = User.query.filter_by(
+                id=current_user.id).first()
+
+            db_user.name = name
+            db_user.email = email
+
+            if password != '':
+                db_user.password = generate_password_hash(password, method='sha256')
+
+            db.session.commit()
+
+            flash('Usuário atualizado com sucesso.', 'success')
+            return redirect(url_for('main.profile'))
+
+        except exc.SQLAlchemyError as error_query:
+            flash(str(error_query.orig.args) + " for parameters " +
+                  str(error_query.params), 'error')
+
+
+    return render_template('dashboard/profile.html', user=current_user)
 
 
 @main.route('/database')
@@ -152,8 +196,6 @@ def database_action(action):
                 flash('Todas as informações são obrigatórias.', 'error')
                 return redirect(url_for('main.database'))
 
-            new_database = Database_access(db_user=db_user, user_id=current_user.id, db_host=db_host,
-                                           db_password=db_password, db_name=db_name, db_view=db_view, db_sgbd=db_sgbd, db_port=db_port)
             database = Database_access.query.filter_by(
                 user_id=current_user.id).first()
 

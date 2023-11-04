@@ -3,7 +3,63 @@
 {% extends "parts/base-intern.html" %}
 
 {% block content %}
-<h1 class="title">
-  Bem-vindo, {{ name }}!
-</h1>
+
+<div class="columns is-full">
+  <div class="column">
+    {% include 'parts/alerts.html' %}
+    <div class="box">
+      <h1 class="subtitle">
+        Atualizar dados pessoais
+      </h1>
+      <form method="POST" action="/profile/update">
+        <div class="field">
+          <div class="control has-icons-left">
+            <input class="input" type="text" name="name" placeholder="Nome completo" autocomplete="off"
+              value="{{ user.name }}" required>
+            <span class="icon is-small is-left">
+              <ion-icon name="person-outline"></ion-icon>
+            </span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="control has-icons-left">
+            <input class="input" type="email" name="email" placeholder="E-mail" autocomplete="off"
+              value="{{ user.email }}" required>
+            <span class="icon is-small is-left">
+              <ion-icon name="mail-outline"></ion-icon>
+            </span>
+          </div>
+        </div>
+        <div class="field">
+          <p>Preencha os campos abaixo se desejar mudar de senha:</p>
+        </div>
+        <div class="field">
+          <div class="control has-icons-left">
+            <input class="input" type="text" name="password" placeholder="Nova senha" autocomplete="off">
+            <span class="icon is-small is-left">
+              <ion-icon name="lock-closed-outline"></ion-icon>
+            </span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="control has-icons-left">
+            <input class="input" type="text" name="password2" placeholder="Digite novamente a nova senha"
+              autocomplete="off">
+            <span class="icon is-small is-left">
+              <ion-icon name="lock-closed-outline"></ion-icon>
+            </span>
+          </div>
+        </div>
+        <div class="field">
+          <p class="control">
+            <button class="button is-success">
+              Salvar
+            </button>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
