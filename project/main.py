@@ -43,7 +43,7 @@ def dashboard():
 @main.route('/profile')
 @login_required
 def profile():
-    return render_template('dashboard/profile.html', user=current_user)
+    return render_template('account/profile.html', user=current_user)
 
 @main.route('/profile/<action>', methods=['POST'])
 @login_required
@@ -84,7 +84,7 @@ def profile_action(action):
                   str(error_query.params), 'error')
 
 
-    return render_template('dashboard/profile.html', user=current_user)
+    return render_template('account/profile.html', user=current_user)
 
 
 @main.route('/database')
